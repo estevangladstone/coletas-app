@@ -1,21 +1,29 @@
+import React, { useEffect } from 'react';
+import {SSRProvider} from '@react-aria/ssr'; 
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { NativeBaseProvider, Box } from 'native-base';
+import { NavigationContainer } from '@react-navigation/native';
+import NavigationStack from './src/screens';
+import DatabaseInit from './src/database/DatabaseInit';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    
+    useEffect(() => {
+        new DatabaseInit()
+        console.log("initialize database")
+    }, []);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    return (
+        <SSRProvider>
+            <NavigationContainer>
+                <NativeBaseProvider>
+                    <Box flex={1}>
+                        <NavigationStack />
+                    </Box>
+                </NativeBaseProvider>
+                <StatusBar style="light" />
+            </NavigationContainer>
+        </SSRProvider>
+    );
+
+}
