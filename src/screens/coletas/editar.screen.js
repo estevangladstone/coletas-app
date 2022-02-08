@@ -12,15 +12,13 @@ import ColetaService from '../../services/ColetaService';
 import FileService from '../../services/FileService';
 import ConfiguracaoService from '../../services/ConfiguracaoService';
 
+import CameraScreen from './camera.screen';
+
 import ColetaTextField from './components/coleta-text-field';
 import ColetaTextAreaField from './components/coleta-textarea-field';
 import ColetaDatetimeField from './components/coleta-datetime-field';
-
-import CameraScreen from './camera.screen';
 import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
-
-import LoadingOverlay from './components/loading-overlay';
 
 
 const CriarColetaScreen = (props) => {
@@ -32,7 +30,6 @@ const CriarColetaScreen = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [nextNumeroColeta, setNextNumeroColeta] = useState(null);
     const [canEdit, setCanEdit] = useState(false);
-    const [isPreparing, setIsPreparing] = useState(true);
 
     useEffect(async () => {
         const numCol = await ConfiguracaoService.findNextNumeroColeta();
@@ -41,16 +38,16 @@ const CriarColetaScreen = (props) => {
         ColetaService.findById(props.route.params.id)
         .then((response) => { 
             if(Array.isArray(response._array) && response._array.length > 0) {
+                let col = response._array[0]
                 setColeta({
                     ...response._array[0],
-                    data_hora: new Date(response._array[0].data_hora),
-                    numero_coleta: response._array[0].numero_coleta.toString(),
-                    longitude: coleta.longitude ? coleta.longitude.toString() : '',
-                    latitude: coleta.latitude ? coleta.latitude.toString() : '',
-                    altitude: coleta.altitude ? coleta.altitude.toString() : '',
+                    data_hora: new Date(col.data_hora),
+                    numero_coleta: col.numero_coleta.toString(),
+                    longitude: col.longitude ? col.longitude.toString() : '',
+                    latitude: col.latitude ? col.latitude.toString() : '',
+                    altitude: col.altitude ? col.altitude.toString() : '',
                 });
             }
-            setIsPreparing(false);
         })
         .catch((error) => {
             Alert.alert(
@@ -62,6 +59,7 @@ const CriarColetaScreen = (props) => {
 
         ColetaService.getPhotosListById(props.route.params.id)
         .then((photos) => {
+            console.log(photos)
             setPhotoList(photos);
         }).catch((error) => {
             Alert.alert(
@@ -264,8 +262,7 @@ const CriarColetaScreen = (props) => {
             <CameraScreen closeCamera={closeCamera} savePhoto={pushPhoto} />
         </Box>
         ) : ( 
-        <ScrollView flex={1} bg="#fff" scrollEnabled={!isPreparing}>
-            { isPreparing ? <LoadingOverlay /> : null }
+        <ScrollView flex={1} bg="#fff">
             <VStack mx="3" my="2">
 
                 <HStack style={{justifyContent: 'center'}}>

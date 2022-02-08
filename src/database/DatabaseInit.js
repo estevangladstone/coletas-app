@@ -1,4 +1,5 @@
 import { DatabaseConnection } from './DatabaseConnection';
+import { Alert } from 'react-native';
 import { schema } from './schema';
 import * as config from '../config';
 

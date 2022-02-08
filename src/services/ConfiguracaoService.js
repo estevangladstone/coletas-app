@@ -18,15 +18,37 @@ export default class ConfiguracaoService {
 	    );
 	}
 
+    static async createOrUpdateByNome(nome, valor) {
+        let exists = await this.findByNome(nome);
+        if(exists) {
+            await this.updateByNome(nome, valor);
+        } else {
+            await this.create(nome, valor);
+        }
+    }
+
+    static async create(nome, valor) {
+        const db = await DatabaseConnection.getConnection();
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    `INSERT INTO ${table}(nome, valor) VALUES(?, ?);`,
+                    [nome, valor],
+                    () => { resolve(true) },
+                    (txObj, error) => { console.log('Error', error); }
+                )
+            })
+        );
+    }
+    
     static async updateByNome(nome, valor) {
         const db = await DatabaseConnection.getConnection();
-        console.log('update ', nome)
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
                     `UPDATE ${table} SET valor = ? WHERE nome = ?;`,
                     [valor, nome],
-                    () => {console.log('done ', nome); resolve(true)},
+                    () => { resolve(true) },
                     (txObj, error) => { console.log('Error', error); }
                 )
             })
@@ -40,7 +62,11 @@ export default class ConfiguracaoService {
                 tx.executeSql(
                     `SELECT * FROM ${table} WHERE nome = ?;`,
                     [nome],
-                    (txObj, { rows }) => resolve(rows._array[0]), 
+                    (txObj, { rows }) => {
+                        if(rows._array.length) {
+                            resolve(rows._array[0])
+                        } else { resolve(null) }
+                    }, 
                     (txObj, error) => console.log('Error ', error)
                 );
             })
@@ -54,7 +80,13 @@ export default class ConfiguracaoService {
                 tx.executeSql(
                     `SELECT valor FROM ${table} WHERE nome = 'proximo_numero_coleta';`,
                     null,
-                    (txObj, { rows }) => resolve(parseInt(rows._array[0].valor)), 
+                    (txObj, { rows }) => {
+                        if(rows._array.length) {
+                            resolve(rows._array[0].valor)
+                        } else {
+                            resolve(1)
+                        }
+                    }, 
                     (txObj, error) => { console.log('Error ', error) }
                 );
             })
@@ -62,17 +94,22 @@ export default class ConfiguracaoService {
     }
 
     static async updateNextNumeroColeta(valor) {
-        const db = await DatabaseConnection.getConnection();
-        return new Promise(
-            (resolve, reject) => db.transaction(tx => {
-                tx.executeSql(
-                    `UPDATE ${table} SET valor = ? WHERE nome = 'proximo_numero_coleta';`,
-                    [parseInt(valor)],
-                    () => resolve(true), 
-                    (txObj, error) => { console.log('Error ', error) }
-                );
-            })
-        );
+        let exists = await this.findByNome('proximo_numero_coleta');
+        if(!exists) {
+            await this.create('proximo_numero_coleta', valor);
+        } else {
+            const db = await DatabaseConnection.getConnection();
+            return new Promise(
+                (resolve, reject) => db.transaction(tx => {
+                    tx.executeSql(
+                        `UPDATE ${table} SET valor = ? WHERE nome = 'proximo_numero_coleta';`,
+                        [parseInt(valor)],
+                        () => resolve(true), 
+                        (txObj, error) => { console.log('Error ', error) }
+                    );
+                })
+            );
+        }
     }
 
     static async findNomeColetor() {
@@ -82,7 +119,13 @@ export default class ConfiguracaoService {
                 tx.executeSql(
                     `SELECT valor FROM ${table} WHERE nome = 'nome_coletor';`,
                     null,
-                    (txObj, { rows }) => resolve(rows._array[0].valor), 
+                    (txObj, { rows }) => {
+                        if(rows._array.length) {
+                            resolve(rows._array[0].valor)
+                        } else {
+                            resolve('')
+                        }
+                    }, 
                     (txObj, error) => { console.log('Error ', error) }
                 );
             })

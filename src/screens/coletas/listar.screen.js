@@ -4,7 +4,7 @@ import ColetaService from '../../services/ColetaService';
 import ColetaCard from './components/coleta-card';
 import { MaterialIcons } from "@expo/vector-icons";
 import { 
-    Box, Heading, Button, FlatList, VStack, Fab, Icon, Pressable, Image, Text, Center
+    Box, Heading, Button, FlatList, VStack, Fab, Icon, Pressable, Text, Center, Spinner
 } from 'native-base';
 import CameraScreen from './camera.screen';
 
@@ -13,7 +13,8 @@ const ListarColetaScreen = (props) => {
 
     const [coletas, setColetas] = useState([]);
     const [startCamera, setStartCamera] = useState(false);
-    const [photoList, setPhotoList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [haveMore, setHaveMore] = useState(true);
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -25,29 +26,55 @@ const ListarColetaScreen = (props) => {
     }, [props.navigation]);
 
     const listar = () => {
-        ColetaService.findAll()
-            .then(response => setColetas(response));
+        ColetaService.fetchMore(7, 0)
+            .then(response => {
+                if(response.length == 0) {
+                    setHaveMore(false);
+                }
+                setColetas(response);
+                setIsLoading(false);
+            });
+    }
+
+    const fetchMore = () => {
+        if(!haveMore) { return null }
+            
+        setIsLoading(true);    
+        ColetaService.fetchMore(5, coletas.length)
+            .then(response => {
+                if(response.length == 0) {
+                    setHaveMore(false);
+                } else {
+                    setColetas([...coletas, ...response]);
+                }
+                setIsLoading(false);
+            });   
     }
 
     return (
         <Box flex={1} bg="#fff">
             <VStack space={2} flex={1}>
                 { coletas.length > 0 ?
-                <FlatList
-                    data={coletas}
-                    renderItem={({item}) => (
-                        <Pressable
-                            onPress={() => props.navigation.navigate('Editar', { id:item.id })}>
-                            <ColetaCard item={item} />
-                        </Pressable>
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-                : 
+                <Box flex={1}>
+                    <FlatList
+                        data={coletas}
+                        onEndReached={() => fetchMore()}
+                        onEndReachedThreshold={0}
+                        renderItem={({item}) => (
+                            <Pressable
+                                onPress={() => props.navigation.navigate('Editar', { id:item.id })}>
+                                <ColetaCard item={item} />
+                            </Pressable>
+                        )}
+                        keyExtractor={(item, index) => index.toString()}
+                        ListFooterComponent={ isLoading ? <Spinner size="lg" p="2" color="green.500" /> : null }
+                    />
+                </Box> : null }
+                { coletas.length == 0 && !haveMore ? 
                 <Center my="3">
                     <Text fontSize="md">
                     Não existem registros de Coletas cadastrados.</Text>
-                </Center> }
+                </Center> : null }
                 
                 { isFocused ?
                 <Fab

@@ -8,6 +8,8 @@ import {
 } from 'native-base';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import PhotoModal from './photo-modal';
+import FileService from '../../../services/FileService';
+
 
 const CameraControls = (props) => {
 
@@ -21,6 +23,11 @@ const CameraControls = (props) => {
 
     const closePhotoModal = () => {
         setShowModal(false);
+    }
+
+    const deletePhoto = async (photoUri) => {
+        await FileService.deleteFile(photoUri, true);
+        props.removePhoto(photoUri);
     }
 
     return (
@@ -68,7 +75,7 @@ const CameraControls = (props) => {
                 photo={selectedPhoto}
                 openModal={showModal} 
                 closeModal={() => closePhotoModal()} 
-                removePhoto={() => props.removePhoto(selectedPhoto)}/>
+                removePhoto={async () => await deletePhoto(selectedPhoto)}/>
         </HStack>
     );
 }

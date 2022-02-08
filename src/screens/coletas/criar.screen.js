@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, BackHandler, View } from 'react-native';
+import { Alert, BackHandler, View, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { 
-    ScrollView, Heading, Button, FormControl, Input, VStack, HStack, FlatList, Pressable, 
-    Image, Box, Icon, Divider    
+    Heading, Button, VStack, HStack, Image, Icon, Divider    
 } from 'native-base';
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -16,11 +15,8 @@ import ColetaTextField from './components/coleta-text-field';
 import ColetaTextAreaField from './components/coleta-textarea-field';
 import ColetaDatetimeField from './components/coleta-datetime-field';
 
-import CameraScreen from './camera.screen';
 import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
-
-import LoadingOverlay from './components/loading-overlay';
 
 
 const CriarColetaScreen = (props) => {
@@ -28,106 +24,96 @@ const CriarColetaScreen = (props) => {
     const [coleta, setColeta] = useState(new Coleta);
     const [errors, setErrors] = useState({});
     const [photoList, setPhotoList] = useState([]);
-    const [startCamera, setStartCamera] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [nextNumeroColeta, setNextNumeroColeta] = useState(null);
-    const [isPreparing, setIsPreparing] = useState(true);
 
     useEffect(async () => {
+        await FileService.deleteTempFiles();
+        
         const numCol = await ConfiguracaoService.findNextNumeroColeta();
         const coletor = await ConfiguracaoService.findNomeColetor();
 
-        setNextNumeroColeta(numCol);
+        setNextNumeroColeta((parseInt(numCol)).toString());
         setColeta({ 
             ...coleta, 
             data_hora: new Date(),
-            numero_coleta: numCol.toString(),
+            numero_coleta: numCol ? (parseInt(numCol)).toString() : '1',
             coletores: coletor,
             pais: 'Brasil',
         });
-        setIsPreparing(false);
     }, []);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const onBackPress = () => {
-                if (startCamera) {
-                    closeCamera();
-                    return true;
-                } else {
-                    return false;
-                }
-            };
+    useEffect(() => {
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            updatePhotosList();
+        });
 
-            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+        return unsubscribe;
+    }, [props.navigation]);
 
-            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        }, [startCamera, closeCamera])
-    );
+    const validate = async () => {
+        let errorList = {};
 
-    const validate = () => {
-        let isValid = true;
-
-        let floatReg = new RegExp('-?[0-9]+\.?[0-9]*');
-        // validar numero de coleta
-        if(coleta.longitude && !floatReg.test(coleta.longitude)) { 
-            setErrors({...errors, longitude:true});
-            isValid = false; 
+        if(isNaN(Number(coleta.longitude))) { 
+            errorList = {...errorList, longitude:true};
         }
-        if(coleta.latitude && !floatReg.test(coleta.latitude)) { 
-            setErrors({...errors, latitude:true});
-            isValid = false; 
+        if(isNaN(Number(coleta.latitude))) { 
+            errorList = {...errorList, latitude:true};
         }
-        if(coleta.altitude && !floatReg.test(coleta.altitude)) { 
-            setErrors({...errors, altitude:true});
-            isValid = false; 
+        if(isNaN(Number(coleta.altitude))) { 
+            errorList = {...errorList, altitude:true};
         }
-        if(coleta.numero_coleta && coleta.numero_coleta < nextNumeroColeta) {
-            setErrors({...errors, numero_coleta:true });
-            isValid = false;
+
+        let num = Number(coleta.numero_coleta);
+        if((num && !Number.isInteger(num)) || num && num < 1 
+            || (num && parseInt(coleta.numero_coleta).toString() != coleta.numero_coleta)) {
+            errorList = {...errorList, numero_coleta:true};
+        } else if(await ColetaService.findByNumeroColeta(num)) {
+            errorList = {...errorList, numero_coleta:true};
+        }
+
+        if(Object.keys(errorList).length) {
+            setErrors({...errors, ...errorList})
+            return false;
+        } else {
+            return true;
         }
 
         return isValid;
     }
 
-    const onSubmit = () => {
+    const onSubmit = async () => {
         setIsLoading(true);
-        if(!validate()) {
+        if(!(await validate())) {
             setIsLoading(false);
+            Alert.alert(
+                "Aviso",
+                "Existem erros nos dados preenchidos. Realize os ajustes necessários e tente novamente.",
+                [{ text: "OK", style: "default" }] );
             return false;
         } 
 
-        ColetaService.create({
-            ...coleta, 
-            data_hora: coleta.data_hora.toISOString(),
-            numero_coleta: coleta.numero_coleta ? parseInt(coleta.numero_coleta) : null,
-            longitude: coleta.longitude ? parseFloat(coleta.longitude) : null,
-            latitude: coleta.latitude ? parseFloat(coleta.latitude) : null,
-            altitude: coleta.altitude ? parseFloat(coleta.altitude) : null,
-        }).then(async (insertId) => {
-            // salvar fotos e atualizar thumbnail
-            let photosDir = 'registro_'+insertId;
-            let savedPhotos = await FileService.saveBatch(photoList, photosDir, coleta.coletores, coleta.numero_coleta);
-            if(savedPhotos.length > 0) {
-                // TODO: fazer um create thumbnail no FileService para diminuir a imagem
-                let thumbnail = FileService.getFileUri(photosDir+'/'+savedPhotos[0]);  
-                ColetaService.updateThumbnailById(thumbnail, insertId);
+        ColetaService.create(
+            coleta, photoList
+        ).then((insertId) => {
+            if(!insertId) {
+                Alert.alert(
+                    "Erro",
+                    "Ocorreu um problema ao tentar salvar o registro de Coleta.",
+                    [{ text: "OK", style: "default" }] );
+            } else {
+                setIsLoading(false);
+                Alert.alert(
+                    "Sucesso",
+                    "Registro de coleta criado com sucesso!",
+                    [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }]);
             }
-
-            setIsLoading(false);
-            Alert.alert(
-                "Sucesso",
-                "Registro de coleta criado com sucesso!",
-                [
-                    { text: "OK", onPress: () => props.navigation.goBack(), style: "default" },
-                ]
-            );
-        }).catch(() => {
+        }).catch((erro) => {
+            console.log(erro)
             Alert.alert(
                 "Erro",
                 "Ocorreu um problema ao tentar salvar o registro de Coleta.",
-                [{ text: "OK", style: "default" }]
-            );
+                [{ text: "OK", style: "default" }] );
         });
     };
     
@@ -137,46 +123,38 @@ const CriarColetaScreen = (props) => {
             "Tem certeza que quer descartar os dados preenchidos (incluíndo fotos) e retornar a tela de Coletas?",
             [
                 { text: "NÃO", style: "cancel" },
-                { text: "SIM", onPress: () => props.navigation.goBack(), style: "destructive" },
+                { text: "SIM", onPress: async () => {
+                    await FileService.deleteTempFiles();
+                    props.navigation.goBack();
+                }, style: "destructive" },
             ],
             { cancelable: true }
         );
-    } 
+    }
 
     const openCamera = () => {
-        props.navigation.setOptions({ headerShown:false });
-        setStartCamera(true);
+        props.navigation.navigate('Camera');
     }
 
-    const closeCamera = () => {
-        props.navigation.setOptions({ headerShown:true });
-        setStartCamera(false);
-    }
-    
-    const pushPhoto = (newPhoto) => {
-        setPhotoList([ ...photoList, newPhoto ]);
+    const updatePhotosList = async () => {
+        let photos = await FileService.getTempContents();
+        setPhotoList(photos);
     }
 
     const popPhoto = (photo) => {
         setPhotoList(photoList.filter((item) => { 
-            return item !== photo 
+            return item !== photo;
         }));
     }
 
-    return startCamera ?
-        (
-        <Box flex={1} bg="#fff">
-            <CameraScreen closeCamera={closeCamera} savePhoto={pushPhoto} />
-        </Box>
-        ) : ( 
-        <ScrollView flex={1} bg="#fff" scrollEnabled={!isPreparing}>
-            { isPreparing ? <LoadingOverlay /> : null }
+    return (
+        <ScrollView  style={{flex: 1, backgroundColor:'#fff'}}>
             <VStack mx="3" my="2">
 
                 <CameraControls 
                     photos={photoList} 
-                    openCamera={openCamera}
-                    removePhoto={(photo) => popPhoto(photo)}/>
+                    openCamera={openCamera} 
+                    removePhoto={popPhoto} />
                     
                 <ColetaDatetimeField
                     value={coleta.data_hora}
@@ -185,9 +163,12 @@ const CriarColetaScreen = (props) => {
                     label="Número da Coleta"
                     value={coleta.numero_coleta}
                     keyboardType="numeric"
-                    setValue={(value) => setColeta({...coleta, numero_coleta:value})}
+                    setValue={(value) => { 
+                        setColeta({...coleta, numero_coleta:value})
+                        setErrors({}) 
+                    }}
                     isInvalid={'numero_coleta' in errors}
-                    errorMessage={"Já existe Coleta com esse número. O próximo número disponível é "+nextNumeroColeta}/>
+                    errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+nextNumeroColeta}/>
                 <ColetaTextField 
                     label="Coletor (ou Coletores)"
                     value={coleta.coletores}
@@ -226,7 +207,7 @@ const CriarColetaScreen = (props) => {
                 <Heading size="md" mb="2">Localização</Heading>
                 
                 <HStack>
-                    <Box w="85%">
+                    <View style={{width: '85%'}}>
                         <ColetaTextField 
                             label="Longitude"
                             value={coleta.longitude}
@@ -235,7 +216,7 @@ const CriarColetaScreen = (props) => {
                                 setErrors({})
                             }}
                             keyboardType="numeric"
-                            isInvalid={'numero_coleta' in errors}
+                            isInvalid={'longitude' in errors}
                             errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
                         <ColetaTextField 
                             label="Latitude"
@@ -245,7 +226,7 @@ const CriarColetaScreen = (props) => {
                                 setErrors({})
                             }}
                             keyboardType="numeric"
-                            isInvalid={'numero_coleta' in errors}
+                            isInvalid={'latitude' in errors}
                             errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
                         <ColetaTextField 
                             label="Altitude (em metros)"
@@ -255,9 +236,9 @@ const CriarColetaScreen = (props) => {
                                 setErrors({})
                             }}
                             keyboardType="numeric"
-                            isInvalid={'numero_coleta' in errors}
+                            isInvalid={'altitude' in errors}
                             errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
-                    </Box>
+                    </View>
 
                     <LocationControls 
                         setLocationData={(values) => setColeta({...coleta, ...values})} />
@@ -283,31 +264,19 @@ const CriarColetaScreen = (props) => {
                 <ColetaTextAreaField 
                     label="Observações"
                     value={coleta.observacoes}
-                    helperText="Lembre-se de anotar informações que serão perdidas após a secagem do espécime."
                     setValue={(value) => setColeta({...coleta, observacoes:value})}/>
 
                 <Button 
-                    isLoading={isLoading} size="lg" mt="2" colorScheme="green"
-                    _loading={{
-                        bg: "green",
-                        _text: {
-                            color: "white"
-                        }
-                    }}
-                    _spinner={{
-                        color: "white"
-                    }}
-                    isLoadingText="Salvando"
-                    onPress={onSubmit}>
+                    size="lg" mt="2" colorScheme="green"
+                    onPress={async () => await onSubmit()}>
                     Salvar
                 </Button>
                 <Button size="lg" colorScheme="danger" variant="ghost" mt="2"
-                    onPress={() => confirmExit()}>
+                    onPress={confirmExit}>
                     Sair
                 </Button>
             </VStack>
-        </ScrollView>
-        );
+        </ScrollView>);
 }
 
 export default CriarColetaScreen;

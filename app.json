@@ -24,7 +24,8 @@
         "foregroundImage": "./src/assets/imgs/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.estevangnm.Project"
+      "package": "com.estevangnm.Project",
+      "permissions": [ "CAMERA", "WRITE_EXTERNAL_STORAGE", "CAMERA_ROLL" , "LOCATION" ]
     },
     "web": {
       "favicon": "./src/assets/imgs/favicon.png"

@@ -1,13 +1,3 @@
-const isFilled = (value=null) => {
-    if(typeof value === undefined) {
-        return false;
-    }
-    if(value) {
-        return true;
-    }
-    return false;
-}
-
 const generateImageName = (coletor, numero) => {
     let now = new Date,
         anoFull = now.getFullYear(),
@@ -18,9 +8,7 @@ const generateImageName = (coletor, numero) => {
         hora  = now.getHours().toString(),
         horaFull = (hora.length == 1) ? '0'+hora : hora,
         minutos  = now.getMinutes().toString(),
-        minutosFull = (minutos.length == 1) ? '0'+minutos : minutos,
-        segundos  = now.getSeconds().toString(),
-        segundosFull = (segundos.length == 1) ? '0'+segundos : segundos;
+        minutosFull = (minutos.length == 1) ? '0'+minutos : minutos;
         
     let data = anoFull+'-'+mesFull+'-'+diaFull+'-'+horaFull+'-'+minutosFull+'-'+segundosFull;
 
@@ -34,9 +22,12 @@ const formatDatetime = (datetime) => {
         mes  = (parsedDate.getMonth()+1).toString(),
         mesFull = (mes.length == 1) ? '0'+mes : mes,
         anoFull = parsedDate.getFullYear(),
-        horario = parsedDate.toLocaleTimeString('pt-BR', {timeZone: 'UTC'});
+        hora  = parsedDate.getHours().toString(),
+        horaFull = (hora.length == 1) ? '0'+hora : hora,
+        minutos  = parsedDate.getMinutes().toString(),
+        minutosFull = (minutos.length == 1) ? '0'+minutos : minutos;
 
-	return diaFull+'/'+mesFull+'/'+anoFull+' às '+horario;
+	return diaFull+'/'+mesFull+'/'+anoFull+' às '+horaFull+':'+minutosFull;
 }
 
-export { generateImageName, formatDatetime, isFilled };
+export { generateImageName, formatDatetime };

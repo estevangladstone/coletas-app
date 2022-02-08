@@ -8,7 +8,7 @@ import ColetaService from '../../services/ColetaService';
 
 const ConfiguracoesScreen = (props) => {
 
-    const [configuracoes, setConfiguracoes] = useState({});
+    const [configuracoes, setConfiguracoes] = useState({proximo_numero_coleta: '', nome_coletor: ''});
     const [maxNumCol, setMaxNumCol] = useState(null);
     const [isNumInvalid, setIsNumInvalid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -16,11 +16,13 @@ const ConfiguracoesScreen = (props) => {
     useEffect(() => {
         ConfiguracaoService.findAll()
             .then(configs => {
-                let result = configs.reduce((map, config) => {
-                    map[config.nome] = config.valor;
-                    return map;
-                }, {});
-                setConfiguracoes({...result});
+                if(configs.length) {
+                    let result = configs.reduce((obj, item) => {
+                        obj[item.nome] = item.valor; 
+                        return obj;
+                    }, {});
+                    setConfiguracoes({...configuracoes, ...result});
+                }
             })
             .catch(error => {
                 Alert.alert(
@@ -32,7 +34,9 @@ const ConfiguracoesScreen = (props) => {
             });
 
         ColetaService.getMaxNumeroColeta()
-            .then(num => setMaxNumCol(parseInt(num)))
+            .then(max => { 
+                max ? setMaxNumCol(max) : setMaxNumCol(0);
+            })
             .catch(error => {
                 Alert.alert(
                     "Erro",
@@ -49,6 +53,11 @@ const ConfiguracoesScreen = (props) => {
             setIsNumInvalid(true);
             return false;
         }
+        let num = Number(configuracoes.proximo_numero_coleta);
+        if(!Number.isInteger(num) || num < 1) {
+            setIsNumInvalid(true);
+            return false;
+        }
         if(!configuracoes.proximo_numero_coleta) {
             setIsNumInvalid(true);
             return false;
@@ -59,7 +68,7 @@ const ConfiguracoesScreen = (props) => {
     const onSubmit = () => {
         Alert.alert(
             "Atenção",
-            "Tem certeza que deseja salvar as alterações?",
+            "Tem certeza que deseja salvar as alterações nas configurações?",
             [{ text: "NÃO", style: "cancel" },
             { text: "SIM", onPress: saveChanges, style: "destructive" }],
             { cancelable: true }
@@ -73,10 +82,10 @@ const ConfiguracoesScreen = (props) => {
             return false;
         }
 
-        await ConfiguracaoService.updateByNome(
-            'proximo_numero_coleta', configuracoes.proximo_numero_coleta);
-        await ConfiguracaoService.updateByNome(
+        await ConfiguracaoService.createOrUpdateByNome(
             'nome_coletor', configuracoes.nome_coletor);
+        await ConfiguracaoService.createOrUpdateByNome(
+            'proximo_numero_coleta', parseInt(configuracoes.proximo_numero_coleta));
 
         setIsLoading(false);
         Alert.alert(
@@ -96,15 +105,14 @@ const ConfiguracoesScreen = (props) => {
                     setValue={(value) => setConfiguracoes({...configuracoes, nome_coletor:value})}/>
                 <ColetaTextField 
                     label="Próximo número de Coleta"
-                    value={configuracoes.proximo_numero_coleta ? 
-                        parseInt(configuracoes.proximo_numero_coleta).toString() : ''}
+                    value={configuracoes.proximo_numero_coleta ? configuracoes.proximo_numero_coleta.toString() : ''}
                     keyboardType="numeric"
                     setValue={(value) => { 
-                        setConfiguracoes({...configuracoes, proximo_numero_coleta:parseInt(value)})
+                        setConfiguracoes({...configuracoes, proximo_numero_coleta:value})
                         setIsNumInvalid(false)
                     }}
                     isInvalid={isNumInvalid}
-                    errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+(maxNumCol+1)}/>
+                    errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+parseInt(maxNumCol+1)}/>
 
                 <Button 
                     isLoading={isLoading} size="lg" mt="2" colorScheme="green"

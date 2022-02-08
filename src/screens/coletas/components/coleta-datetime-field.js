@@ -19,8 +19,18 @@ const ColetaDatetimeField = (props) => {
 
     useEffect(() => {
         if(props.value instanceof Date) {
-            setMaskedDate(props.value.toLocaleDateString('pt-BR', {timeZone: 'UTC'}));
-            setMaskedTime(props.value.toLocaleTimeString('pt-BR', {timeZone: 'UTC'}));
+            let anoFull = props.value.getFullYear(),
+                mes  = (props.value.getMonth()+1).toString(),
+                mesFull = (mes.length == 1) ? '0'+mes : mes,
+                dia  = props.value.getDate().toString(),
+                diaFull = (dia.length == 1) ? '0'+dia : dia;
+            setMaskedDate(diaFull+'/'+mesFull+'/'+anoFull);
+            
+            let hour = props.value.getHours().toString(),
+                minutes = props.value.getMinutes().toString();
+            let hourFull = (hour.length == 1) ? '0'+hour : hour,
+                minutesFull = (minutes.length == 1) ? '0'+minutes : minutes;
+            setMaskedTime(hourFull+':'+minutesFull);
         }
     }, [props.value]);
 

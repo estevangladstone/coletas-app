@@ -106,12 +106,12 @@ export default class FileService {
 	}
 
 	static async createCacheFile(fileName, contents) {
-        let fileUri = FileSystem.cacheDirectory+fileName;
+        let fileUri = FileSystem.documentDirectory+fileName;
         await FileSystem.writeAsStringAsync(
         	fileUri, contents, { encoding: FileSystem.EncodingType.UTF8 }
     	);
     	console.log(await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory));
-    	return FileSystem.cacheDirectory+fileName;
+    	return FileSystem.documentDirectory+fileName;
 	}
 
 	static getPhotosDir() {
@@ -127,4 +127,37 @@ export default class FileService {
 		return await FileSystem.getInfoAsync(fileTo);
 	}
 
+	// TODO: Não esquecer de limpar 'temp/' quando sair da coleta incompleta
+	static async saveInTemp(fileUri) {
+		// ensures temp directory exists in cacheDirectory
+		if(!(await FileSystem.getInfoAsync(FileSystem.cacheDirectory+'temp')).exists) {
+		    await FileSystem.makeDirectoryAsync(FileSystem.cacheDirectory+'temp');
+		}
+
+		if((await FileSystem.getInfoAsync(fileUri)).exists) {
+			let time = (new Date).getTime().toString();
+			await FileSystem.moveAsync({
+				from: fileUri,
+				to: FileSystem.cacheDirectory+'temp/'+time+'.jpeg' 
+			});
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	static async getTempContents() {
+		if(!(await FileSystem.getInfoAsync(FileSystem.cacheDirectory+'temp')).exists) {
+		    return [];
+		}
+
+		let list = await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory+'temp');
+		return list.map(itemUri => {
+			return FileSystem.cacheDirectory+'temp/'+itemUri;
+		});
+	}
+
+	static async deleteTempFiles() {
+		await FileSystem.deleteAsync(FileSystem.cacheDirectory+'temp', { idempotent:true });
+	}
 }

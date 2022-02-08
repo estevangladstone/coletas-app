@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-    Alert, StyleSheet, Text, ImageBackground, Dimensions, Plataform, BackHandler
+    Alert, StyleSheet, Text, View, TouchableOpacity, ImageBackground, Dimensions,
+    Plataform, BackHandler
 } from 'react-native';
-import { Button, IconButton, Box } from 'native-base';
 import { Camera } from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from "@expo/vector-icons";
+import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
+import FileService from '../../services/FileService';
 
 
 const CameraScreen = (props) => {
@@ -17,19 +18,11 @@ const CameraScreen = (props) => {
     
     const [ratio, setRatio] = useState(null);
     const [isRatioSet, setIsRatioSet] = useState(false);
-    const { height, width } = Dimensions.get('window');
-    const screenRatio = height / width;
-    const [imagePadding, setImagePadding] = useState(0);
     const cameraRef = useRef(null);
 
     useEffect(() => {
         (async () => {
             const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
-
-        (async () => {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
             setHasPermission(status === 'granted');
         })();
     }, []);
@@ -47,6 +40,8 @@ const CameraScreen = (props) => {
         // This issue only affects Android
         if (Platform.OS === 'android') {
             const ratios = await cameraRef.current.getSupportedRatiosAsync();
+            const { height, width } = Dimensions.get('window');
+            const screenRatio = height / width;
 
             // Calculate the width/height of each of the supported camera ratios
             // These width/height are measured in landscape mode
@@ -76,7 +71,6 @@ const CameraScreen = (props) => {
                 (height - realRatios[desiredRatio] * width) / 2
             );
             // set the preview padding and preview ratio
-            setImagePadding(remainder);
             setRatio(desiredRatio);
             // Set a flag so we don't do this 
             // calculation each time the screen refreshes
@@ -87,13 +81,24 @@ const CameraScreen = (props) => {
     const takePhoto = async () => {
         if(cameraRef) {
             try {
-                let photo = await cameraRef.current.takePictureAsync({
+                let pic = await cameraRef.current.takePictureAsync({
                     skipProcessing: true,
                     allowEditing: true,
                     aspect: [4, 3],
                     quality: 1
                 });
-                return photo;
+
+                if(!pic.cancelled) {
+                    if (type === Camera.Constants.Type.front) {
+                        pic = await manipulateAsync(
+                            pic.localUri || pic.uri,
+                            [{ rotate: 180 }, { flip: FlipType.Vertical },],
+                            { compress: 1, format: SaveFormat.JPEG }
+                        );
+                    }
+                    setPhoto(pic.uri);
+                    setOpenCamera(false);
+                }
             } catch(e) {
                 Alert.alert(
                     "Erro",
@@ -105,8 +110,16 @@ const CameraScreen = (props) => {
         }
     };
 
+    const savePhoto = async () => {
+        await FileService.saveInTemp(photo);
+    }
+
+    const closeCamera = () => {
+        props.navigation.goBack();
+    }
+
     if (hasPermission === null) {
-        return <Box />;
+        return <View />;
     }
     if (hasPermission === false) {
         return <Text>Sem permissão de acesso a câmera.</Text>;
@@ -115,46 +128,22 @@ const CameraScreen = (props) => {
         (<Camera
             onCameraReady={setCameraReady}
             style={{flex:1}}
-            ratio={ratio}
+            ratio={'4:3'}
             type={type}
             ref={cameraRef} >
-            <Box style={styles.controlsContainer}>
-                <Box style={styles.buttonContainer}>
-                    <IconButton 
-                        size="12"
-                        borderRadius="full"
-                        colorScheme="indigo"
+            <View style={styles.controlsContainer}>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
                         style={styles.camera_button}
-                        onPress={() => props.closeCamera()}
-                        _icon={{
-                            as: MaterialIcons,
-                            name: "close",
-                            size:12,
-                            color:'white'
-                        }} />
-                    <IconButton 
-                        size="20"
-                        borderRadius="full"
-                        colorScheme="error"
+                        onPress={closeCamera} >
+                        <MaterialIcons name="close" size={50} color="white"/>    
+                    </TouchableOpacity>
+                    <TouchableOpacity 
                         style={styles.camera_button}
-                        onPress={async () => {
-                            const r = await takePhoto();
-                            if(!r.cancelled) {
-                                setPhoto(r.uri);
-                                setOpenCamera(false);
-                            }
-                        }}
-                        _icon={{
-                            as: MaterialIcons,
-                            name: "radio-button-off",
-                            size:20,
-                            color:'white'
-                        }}
-                         />
-                    <IconButton 
-                        size="12"
-                        borderRadius="full"
-                        colorScheme="indigo"
+                        onPress={takePhoto}>
+                        <MaterialIcons name="radio-button-off" size={85} color="white"/>    
+                    </TouchableOpacity>
+                    <TouchableOpacity 
                         style={styles.camera_button}
                         onPress={() => {
                             setType(
@@ -162,68 +151,43 @@ const CameraScreen = (props) => {
                                     ? Camera.Constants.Type.front
                                     : Camera.Constants.Type.back
                             );
-                        }}
-                        _icon={{
-                            as: MaterialIcons,
-                            name: "flip-camera-ios",
-                            size:12,
-                            color:'white',
-                        }} />
-                </Box>
-            </Box>
+                        }}>
+                        <MaterialIcons name="flip-camera-ios" size={50} color="white"/>    
+                    </TouchableOpacity>
+                </View>
+            </View>
         </Camera>)
         : 
-        (<Box flex={1} justifyContent="center">
+        (<View flex={1} style={{ justifyContent:"center" }}>
             <ImageBackground 
                 style={styles.photo_preview}
                 source={{ uri:photo }}
                 >
-                <Box style={styles.controlsContainer}>
-                    <Box style={styles.buttonContainer}>
-                        <IconButton 
-                            size="12"
-                            borderRadius="full"
-                            colorScheme="indigo"
+                <View style={styles.controlsContainer}>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
                             style={styles.camera_button}
-                            onPress={() => props.closeCamera()}
-                            _icon={{
-                                as: MaterialIcons,
-                                name: "close",
-                                size:12,
-                                color:'white'
-                            }} />
-                        <IconButton 
-                            size="16"
-                            borderRadius="full"
-                            colorScheme="error"
+                            onPress={closeCamera}>
+                            <MaterialIcons name="close" size={50} color="white"/>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
                             style={styles.camera_button}
-                            onPress={() => setOpenCamera(true)}
-                            _icon={{
-                                as: MaterialIcons,
-                                name: "redo",
-                                size:16,
-                                color:'white'
-                            }}
-                             />
-                        <IconButton 
-                            size="12"
-                            borderRadius="full"
-                            colorScheme="indigo"
+                            onPress={() => setOpenCamera(true)}>
+                            <MaterialIcons name="redo" size={75} color="white"/>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             style={styles.camera_button}
-                            onPress={() => {
-                                props.savePhoto(photo);
-                                props.closeCamera();
-                            }}
-                            _icon={{
-                                as: MaterialIcons,
-                                name: "check",
-                                size:12,
-                                color:'white',
-                            }} />
-                    </Box>
-                </Box>
+                            onPress={async () => {
+                                //props.savePhoto(photo);
+                                await savePhoto();
+                                closeCamera();
+                            }}>
+                            <MaterialIcons name="check" size={50} color="white"/>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </ImageBackground>
-        </Box>
+        </View>
         );
 
 }

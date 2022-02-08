@@ -1,20 +1,29 @@
-import React from 'react';
-import { Alert } from 'react-native';
-import { Box, VStack, Button, Divider, Heading, Text } from 'native-base';
+import React, {useEffect} from 'react';
+import { Alert, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { MaterialIcons } from "@expo/vector-icons";
+import FotoService from '../../services/FotoService';
+import * as MediaLibrary from 'expo-media-library';
 
 
 const SobreScreen = (props) => {
 
+    useEffect(async () => {
+        let t = await FotoService.findAll();
+        console.log(t)
+
+    }, []);
+
     return (
-        <Box flex={1} bg="#fff">
-            <VStack mx="3" my="2">
-                <Heading size="md" mb="1">Sobre</Heading>
-                <Text my="1">
+        <View style={{flex:1, backgroundColor: '#fff'}}>
+            <View style={{ marginVertical: '2%', marginHorizontal: '3%' }}>
+                <Text style={{ fontSize:20, fontWeight:'bold', marginBottom: '1%' }}>Sobre</Text>
+                <Text style={{ marginVertical: 1, fontSize:16 }}>
                     Texto informativo sobre o aplicativo, objetivo e links para projeto no github e arquivo do TCC ?
                 </Text>
-            </VStack>
-        </Box>
+            </View>
+        </View>
     );
 }
 
 export default SobreScreen;
+

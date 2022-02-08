@@ -5,6 +5,7 @@ import { Menu, Pressable, HamburgerIcon, Box, Spacer } from 'native-base';
 import ListarColetaScreen from './coletas/listar.screen';
 import EditarColetaScreen from './coletas/editar.screen';
 import CriarColetaScreen from './coletas/criar.screen';
+import CameraScreen from './coletas/camera.screen';
 import DadosScreen from './dados/';
 import ConfiguracoesScreen from './configuracoes/';
 import SobreScreen from './sobre/';
@@ -70,6 +71,10 @@ const NavigationStack = () => {
 	            name="Sobre" 
 	            component={ SobreScreen }
 	            options={{ title:'Sobre' }} />
+	        <Stack.Screen 
+	            name="Camera" 
+	            component={ CameraScreen }
+	            options={{ title:'', headerShown:false }} />
 	        {/*<Stack.Screen 
 	            name="Projetos" 
 	            component={ ListarProjetosScreen }
