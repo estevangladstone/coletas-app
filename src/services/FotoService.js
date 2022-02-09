@@ -32,7 +32,7 @@ export default class FotoService {
                     [coletaId],
                     (txObj, { rows }) => {
                         if(rows._array.length) {
-                            resolve(rows._array[0])
+                            resolve(rows._array)
                         } else { resolve(null) }
                     }, 
                     (txObj, error) => console.log('Error ', error)
@@ -48,6 +48,20 @@ export default class FotoService {
                 tx.executeSql(
                     `DELETE FROM ${table} WHERE coleta_id = ?;`, 
                     [coletaId], 
+                    () => resolve(true),
+                    (txObj, error) => console.log('Error', error)    
+                )
+            })
+        );
+    }
+
+    static async deleteByAsset(assetId) {
+        const db = await DatabaseConnection.getConnection();
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    `DELETE FROM ${table} WHERE asset_id = ?;`, 
+                    [assetId], 
                     () => resolve(true),
                     (txObj, error) => console.log('Error', error)    
                 )

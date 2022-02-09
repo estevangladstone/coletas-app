@@ -70,6 +70,7 @@ export default class FileService {
 		}
 	}
 
+	// TODO: APAGAR
 	static async deleteFile(filePath=null, raw=false) {
 		try {
 			if(filePath) {
@@ -110,7 +111,6 @@ export default class FileService {
         await FileSystem.writeAsStringAsync(
         	fileUri, contents, { encoding: FileSystem.EncodingType.UTF8 }
     	);
-    	console.log(await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory));
     	return FileSystem.documentDirectory+fileName;
 	}
 
@@ -157,7 +157,19 @@ export default class FileService {
 		});
 	}
 
-	static async deleteTempFiles() {
-		await FileSystem.deleteAsync(FileSystem.cacheDirectory+'temp', { idempotent:true });
+	static async deleteTempFile(fileName=null) {
+		if(fileName) {
+			if(!(await FileSystem.getInfoAsync(FileSystem.cacheDirectory+'temp')).exists) {
+			    return;
+			}
+			let tempFiles = await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory+'temp');
+			let nameParts = fileName.split('/');
+			if(nameParts.length > 0 && tempFiles.includes(nameParts[nameParts.length-1])) {
+				await FileSystem.deleteAsync(fileName, { idempotent:true });
+			}
+		} else {
+			await FileSystem.deleteAsync(FileSystem.cacheDirectory+'temp', { idempotent:true });
+		}
 	}
+
 }

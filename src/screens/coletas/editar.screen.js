@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, BackHandler } from 'react-native';
+import { Alert, BackHandler, View, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { 
-    ScrollView, Heading, Button, FormControl, Input, VStack, HStack, FlatList, Pressable, 
-    Image, Box, Icon, Divider    
+    Heading, Button, VStack, HStack, Image, Icon, Divider    
 } from 'native-base';
 import { MaterialIcons } from "@expo/vector-icons";
 
-import Coleta from '../../models/Coleta';
 import ColetaService from '../../services/ColetaService';
 import FileService from '../../services/FileService';
 import ConfiguracaoService from '../../services/ConfiguracaoService';
 
-import CameraScreen from './camera.screen';
-
 import ColetaTextField from './components/coleta-text-field';
 import ColetaTextAreaField from './components/coleta-textarea-field';
 import ColetaDatetimeField from './components/coleta-datetime-field';
+
 import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
 
 
 const CriarColetaScreen = (props) => {
 
-    const [coleta, setColeta] = useState(new Coleta);
+    const [coleta, setColeta] = useState({});
     const [errors, setErrors] = useState({});
     const [photoList, setPhotoList] = useState([]);
-    const [startCamera, setStartCamera] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [nextNumeroColeta, setNextNumeroColeta] = useState(null);
     const [canEdit, setCanEdit] = useState(false);
+    const [isReady, setIsReady] = useState(false);
 
     useEffect(async () => {
+        await FileService.deleteTempFile();
+        
         const numCol = await ConfiguracaoService.findNextNumeroColeta();
         setNextNumeroColeta(numCol);
 
@@ -48,6 +47,16 @@ const CriarColetaScreen = (props) => {
                     altitude: col.altitude ? col.altitude.toString() : '',
                 });
             }
+
+            ColetaService.getPhotosListById(props.route.params.id)
+            .then((photos) => {
+                const photosUris = photos.map((photo) => {
+                    return photo.uri;
+                });
+                setPhotoList(photosUris);
+            }).then(
+                () => setIsReady(true)
+            );
         })
         .catch((error) => {
             Alert.alert(
@@ -57,56 +66,45 @@ const CriarColetaScreen = (props) => {
             );
         });
 
-        ColetaService.getPhotosListById(props.route.params.id)
-        .then((photos) => {
-            console.log(photos)
-            setPhotoList(photos);
-        }).catch((error) => {
-            Alert.alert(
-                "Erro",
-                "Ocorreu um problema ao tentar abrir as fotos da coleta.",
-                [{ text: "OK", style: "default" }],
-            );
-        });
     }, []);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const onBackPress = () => {
-                if (startCamera) {
-                    closeCamera();
-                    return true;
-                } else {
-                    return false;
-                }
-            };
+    useEffect(() => {
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            if(isReady) {
+                updatePhotosList();
+            }
+        });
 
-            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+        return unsubscribe;
+    }, [props.navigation, isReady]);
 
-            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        }, [startCamera, closeCamera])
-    );
+    const validate = async () => {
+        let errorList = {};
 
-    const validate = () => {
-        let isValid = true;
-
-        let floatReg = new RegExp('-?[0-9]+\.?[0-9]*');
-        // validar numero de coleta
-        if(coleta.longitude && !floatReg.test(coleta.longitude)) { 
-            setErrors({...errors, longitude:true});
-            isValid = false; 
+        if(isNaN(Number(coleta.longitude))) { 
+            errorList = {...errorList, longitude:true};
         }
-        if(coleta.latitude && !floatReg.test(coleta.latitude)) { 
-            setErrors({...errors, latitude:true});
-            isValid = false; 
+        if(isNaN(Number(coleta.latitude))) { 
+            errorList = {...errorList, latitude:true};
         }
-        if(coleta.altitude && !floatReg.test(coleta.altitude)) { 
-            setErrors({...errors, altitude:true});
-            isValid = false; 
+        if(isNaN(Number(coleta.altitude))) { 
+            errorList = {...errorList, altitude:true};
         }
-        if(coleta.numero_coleta && coleta.numero_coleta < nextNumeroColeta) {
-            setErrors({...errors, numero_coleta:true });
-            isValid = false;
+
+        let num = Number(coleta.numero_coleta);
+        if((num && !Number.isInteger(num)) || num && num < 1 
+            || (num && parseInt(coleta.numero_coleta).toString() != coleta.numero_coleta)) {
+            errorList = {...errorList, numero_coleta:true};
+        } else if(await ColetaService.findByNumeroColeta(num) 
+            && coleta.numero_coleta != props.route.params.id) {
+            errorList = {...errorList, numero_coleta:true};
+        }
+
+        if(Object.keys(errorList).length) {
+            setErrors({...errors, ...errorList})
+            return false;
+        } else {
+            return true;
         }
 
         return isValid;
@@ -119,72 +117,24 @@ const CriarColetaScreen = (props) => {
             return false;
         } 
         
-        ColetaService.updateById({
-            ...coleta,
-            data_hora: coleta.data_hora.toISOString(),
-            numero_coleta: coleta.numero_coleta ? parseInt(coleta.numero_coleta) : null,
-            longitude: coleta.longitude ? parseFloat(coleta.longitude) : null,
-            latitude: coleta.latitude ? parseFloat(coleta.latitude) : null,
-            altitude: coleta.altitude ? parseFloat(coleta.altitude) : null,
-        }, coleta.id)
-        .then(async () => {
-            try {
-                let photosDir = 'registro_'+coleta.id;
-                if(photoList.length > 0) {
-                    /* deleta as que precisa, e move o resto com NOVOS NOMES */
-                    ColetaService.getPhotosListById(props.route.params.id)
-                    .then(async (currentPhotos) => {
-                        let toRemove = currentPhotos.filter(
-                            item => !photoList.includes(item)
-                        );
-                        toRemove.forEach(async (item) => { 
-                            await FileService.deleteFile(item, true);
-                        });
 
-                        let savedPhotos = await FileService.saveBatch(
-                            photoList, photosDir, coleta.coletores, coleta.numero_coleta
-                        );
-                        if(savedPhotos.length > 0) {
-                            // TODO: fazer um create thumbnail no FileService para diminuir a imagem
-                            let thumbnail = FileService.getFileUri(
-                                photosDir+'/'+savedPhotos[0]
-                            );  
-                            ColetaService.updateThumbnailById(thumbnail, coleta.id);
-                        }
-                    }).catch(() => {
-                        Alert.alert(
-                            "Erro",
-                            "Ocorreu um problema ao tentar salvar as fotos da Coleta.",
-                            [{ text: "OK", style: "default" }]
-                        );
-                    });
-                } else {
-                    await FileService.deleteFile(photosDir+'/'); /* Remove a pasta inteira */
-                    ColetaService.updateThumbnailById('', coleta.id);
-                }
 
-                Alert.alert(
-                    "Sucesso",
-                    "Registro de coleta atualizado com sucesso!",
-                    [{  text: "OK",
-                        onPress: () => props.navigation.goBack(),
-                        style: "default" }],
-                    { cancelable: true }
-                );
-            } catch(e) { 
-                Alert.alert(
-                    "Erro",
-                    "Ocorreu um problema ao tentar salvar o registro de Coleta.",
-                    [{ text: "OK", style: "default" }]
-                );
-            }
+        ColetaService.updateById(
+            coleta, photoList 
+        ).then(async () => {
+            Alert.alert(
+                "Sucesso",
+                "Registro de coleta atualizado com sucesso!",
+                [{  text: "OK",
+                    onPress: () => props.navigation.goBack(),
+                    style: "default" }],
+                { cancelable: true });
         })
         .catch(() => {
             Alert.alert(
                 "Erro",
                 "Ocorreu um problema ao tentar salvar o registro de Coleta.",
-                [{ text: "OK", style: "default" }]
-            );
+                [{ text: "OK", style: "default" }]);
         });
     }
     
@@ -201,22 +151,22 @@ const CriarColetaScreen = (props) => {
     }
 
     const openCamera = () => {
-        props.navigation.setOptions({ headerShown:false });
-        setStartCamera(true);
+        props.navigation.navigate('Camera');
+    }
+
+    const updatePhotosList = async () => {
+        let photos = await FileService.getTempContents();
+        setPhotoList([...photoList, ...photos]);
     }
 
     const closeCamera = () => {
         props.navigation.setOptions({ headerShown:true });
         setStartCamera(false);
     }
-    
-    const pushPhoto = (newPhoto) => {
-        setPhotoList([ ...photoList, newPhoto ]);
-    }
 
     const popPhoto = (photo) => {
         setPhotoList(photoList.filter((item) => { 
-            return item !== photo 
+            return item !== photo;
         }));
     }
 
@@ -241,12 +191,8 @@ const CriarColetaScreen = (props) => {
     }
 
     const deleteColeta = async () => {
-        let files = await FileService.listDir('registro_'+coleta.id);
-        if(files && files.length > 0) {
-            files.forEach(async (item) => { 
-                await FileService.deleteFile('registro_'+coleta.id+'/'+item);
-            });
-        }
+        // passar atribuição para ColetaService
+        await FileService.deleteTempFile();
         ColetaService.deleteById(coleta.id).then(() => {
             Alert.alert(
                 "Sucesso",
@@ -256,15 +202,9 @@ const CriarColetaScreen = (props) => {
         });
     }
 
-    return startCamera ?
-        (
-        <Box flex={1} bg="#fff">
-            <CameraScreen closeCamera={closeCamera} savePhoto={pushPhoto} />
-        </Box>
-        ) : ( 
-        <ScrollView flex={1} bg="#fff">
+    return (
+        <ScrollView  style={{flex: 1, backgroundColor:'#fff'}}>
             <VStack mx="3" my="2">
-
                 <HStack style={{justifyContent: 'center'}}>
                     <Button size="lg" mr="1" w="49%" colorScheme="green"
                         onPress={() => toggleEdit()}>
@@ -280,27 +220,30 @@ const CriarColetaScreen = (props) => {
 
                 <CameraControls 
                     photos={photoList} 
-                    openCamera={openCamera}
-                    removePhoto={(photo) => popPhoto(photo)}
+                    openCamera={openCamera} 
+                    removePhoto={popPhoto} 
                     isDisabled={!canEdit}/>
                     
                 <ColetaDatetimeField
                     value={coleta.data_hora}
-                    setValue={(value) => setColeta({...coleta, data_hora:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, data_hora:value})}/>
                 <ColetaTextField 
                     label="Número da Coleta"
                     value={coleta.numero_coleta}
+                    isDisabled={!canEdit}
                     keyboardType="numeric"
-                    setValue={(value) => setColeta({...coleta, numero_coleta:value})}
+                    setValue={(value) => { 
+                        setColeta({...coleta, numero_coleta:value})
+                        setErrors({}) 
+                    }}
                     isInvalid={'numero_coleta' in errors}
-                    errorMessage={"Já existe Coleta com esse número. O próximo número disponível é "+nextNumeroColeta}
-                    isDisabled={!canEdit}/>
+                    errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+nextNumeroColeta}/>
                 <ColetaTextField 
                     label="Coletor (ou Coletores)"
                     value={coleta.coletores}
-                    setValue={(value) => setColeta({...coleta, coletores:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, coletores:value})}/>
 
                 <Divider my="2" backgroundColor="#a3a3a3" />
                 <Heading size="md" mb="2">Espécime</Heading>
@@ -308,132 +251,121 @@ const CriarColetaScreen = (props) => {
                 <ColetaTextField 
                     label="Espécie"
                     value={coleta.especie}
-                    setValue={(value) => setColeta({...coleta, especie:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, especie:value})}/>
                 <ColetaTextField 
                     label="Família"
                     value={coleta.familia}
-                    setValue={(value) => setColeta({...coleta, familia:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, familia:value})}/>
                 <ColetaTextField 
                     label="Hábito de crescimento"
                     value={coleta.habito_crescimento}
-                    setValue={(value) => setColeta({...coleta, habito_crescimento:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, habito_crescimento:value})}/>
                 <ColetaTextAreaField 
                     label="Descrição do Espécime"
                     value={coleta.descricao_especime}
+                    isDisabled={!canEdit}
                     helperText="Ex.: cor da flor ou fruto, odores, filotaxia, altura, etc."
-                    setValue={(value) => setColeta({...coleta, descricao_especime:value})}
-                    isDisabled={!canEdit}/>
+                    setValue={(value) => setColeta({...coleta, descricao_especime:value})}/>
                 <ColetaTextField 
                     label="Substrato"
                     value={coleta.substrato}
-                    setValue={(value) => setColeta({...coleta, substrato:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, substrato:value})}/>
                 <ColetaTextAreaField 
                     label="Descrição do Local"
                     value={coleta.descricao_local}
-                    setValue={(value) => setColeta({...coleta, descricao_local:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, descricao_local:value})}/>
 
                 <Divider my="2" backgroundColor="#a3a3a3" />
                 <Heading size="md" mb="2">Localização</Heading>
                 
                 <HStack>
-                    <Box w="85%">
+                    <View style={{width: '85%'}}>
                         <ColetaTextField 
                             label="Longitude"
+                            isDisabled={!canEdit}
                             value={coleta.longitude}
                             setValue={(value) => { 
                                 setColeta({ ...coleta, longitude:value })
                                 setErrors({})
                             }}
                             keyboardType="numeric"
-                            isInvalid={'numero_coleta' in errors}
-                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."
-                            isDisabled={!canEdit}/>
+                            isInvalid={'longitude' in errors}
+                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
                         <ColetaTextField 
                             label="Latitude"
+                            isDisabled={!canEdit}
                             value={coleta.latitude}
                             setValue={(value) => { 
                                 setColeta({ ...coleta, latitude:value })
                                 setErrors({})
                             }}
                             keyboardType="numeric"
-                            isInvalid={'numero_coleta' in errors}
-                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."
-                            isDisabled={!canEdit}/>
+                            isInvalid={'latitude' in errors}
+                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
                         <ColetaTextField 
                             label="Altitude (em metros)"
                             value={coleta.altitude}
+                            isDisabled={!canEdit}
                             setValue={(value) => { 
                                 setColeta({ ...coleta, altitude:value })
                                 setErrors({})
                             }}
                             keyboardType="numeric"
-                            isInvalid={'numero_coleta' in errors}
-                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."
-                            isDisabled={!canEdit}/>
-                    </Box>
+                            isInvalid={'altitude' in errors}
+                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
+                    </View>
 
                     <LocationControls 
                         setLocationData={(values) => setColeta({...coleta, ...values})} 
-                        isDisabled={!canEdit}/>
+                        isDisabled={!canEdit} />
                 </HStack>
 
                 <ColetaTextField 
                     label="País"
                     value={coleta.pais}
-                    setValue={(value) => setColeta({...coleta, pais:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, pais:value})}/>
                 <ColetaTextField 
                     label="Estado"
                     value={coleta.estado}
-                    setValue={(value) => setColeta({...coleta, estado:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, estado:value})}/>
                 <ColetaTextAreaField 
                     label="Localidade"
                     value={coleta.localidade}
+                    isDisabled={!canEdit}
                     setValue={(value) => {
                         setColeta({...coleta, localidade:value});
-                    }}
-                    isDisabled={!canEdit}/>
+                    }}/>
 
                 <Divider my="2" backgroundColor="#a3a3a3" />
 
                 <ColetaTextAreaField 
                     label="Observações"
                     value={coleta.observacoes}
-                    helperText="Lembre-se de anotar informações que serão perdidas após a secagem do espécime."
-                    setValue={(value) => setColeta({...coleta, observacoes:value})}
-                    isDisabled={!canEdit}/>
+                    isDisabled={!canEdit}
+                    setValue={(value) => setColeta({...coleta, observacoes:value})}/>
 
-                { canEdit ? 
-                (<Box>
+                { canEdit ?    
+                <View>
                     <Button 
-                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
-                        _loading={{
-                            bg: "green",
-                            _text: {
-                                color: "white"
-                            }
-                        }}
-                        _spinner={{
-                            color: "white"
-                        }}
-                        isLoadingText="Salvando"
-                        onPress={onSubmit}>
+                        size="lg" mt="2" colorScheme="green"
+                        onPress={async () => await onSubmit()}>
                         Salvar
                     </Button>
                     <Button size="lg" colorScheme="danger" variant="ghost" mt="2"
-                        onPress={() => confirmExit()}>
+                        onPress={confirmExit}>
                         Sair
                     </Button>
-                </Box>) : null }
+                </View>
+                : null}
             </VStack>
-        </ScrollView>
-        );
+        </ScrollView>);
 }
 
 export default CriarColetaScreen;

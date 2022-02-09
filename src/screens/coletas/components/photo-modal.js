@@ -44,6 +44,7 @@ const PhotoModal = (props) => {
 						    onPress={() => props.closeModal()}>
 						    Voltar
 						</Button>
+						{ !props.isDisabled ? 
 						<Button 
 							colorScheme="danger" 
 							onPress={() => {
@@ -61,7 +62,7 @@ const PhotoModal = (props) => {
 								);
 							}}>
 							Remover
-						</Button>
+						</Button> : null }
 					</Button.Group>
 				</Modal.Footer>
 			</Modal.Content>

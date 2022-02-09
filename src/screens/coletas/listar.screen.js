@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import ColetaService from '../../services/ColetaService';
 import ColetaCard from './components/coleta-card';
 import { MaterialIcons } from "@expo/vector-icons";
 import { 
-    Box, Heading, Button, FlatList, VStack, Fab, Icon, Pressable, Text, Center, Spinner
+    Box, Heading, Button, FlatList, VStack, Fab, Icon, Text, Center, Spinner
 } from 'native-base';
 import CameraScreen from './camera.screen';
 
@@ -61,10 +62,10 @@ const ListarColetaScreen = (props) => {
                         onEndReached={() => fetchMore()}
                         onEndReachedThreshold={0}
                         renderItem={({item}) => (
-                            <Pressable
+                            <TouchableOpacity
                                 onPress={() => props.navigation.navigate('Editar', { id:item.id })}>
                                 <ColetaCard item={item} />
-                            </Pressable>
+                            </TouchableOpacity>
                         )}
                         keyExtractor={(item, index) => index.toString()}
                         ListFooterComponent={ isLoading ? <Spinner size="lg" p="2" color="green.500" /> : null }

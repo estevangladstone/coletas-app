@@ -51,11 +51,9 @@ export default class ColetaService {
 
         if(coletaId) {
             if(photos.length) {
-                let album = null;
-                let newAssets = [];
+                let album = await MediaLibrary.getAlbumAsync('fotos_coletas');
                 for(let i=0; i<photos.length; i++) {
                     let asset = await MediaLibrary.createAssetAsync(photos[i]);
-                    album = album ?? await MediaLibrary.getAlbumAsync('fotos_coletas');
                     if(!album) {
                         album = await MediaLibrary.createAlbumAsync('fotos_coletas', asset);
                     } else {
@@ -63,11 +61,14 @@ export default class ColetaService {
                     }
                     let movedAsset = await MediaLibrary.getAssetInfoAsync(asset);
                     await FotoService.create(movedAsset.uri, movedAsset.id, coletaId);
+                    if(i == 0) {
+                        await this.updateThumbnailById(movedAsset.uri, coletaId);    
+                    }
                 }
             }
             
             // remove o diretório temp/
-            await FileService.deleteTempFiles();
+            await FileService.deleteTempFile();
 
             // atualizar numero de coleta
             let nextNC = await ConfiguracaoService.findNextNumeroColeta();
@@ -81,7 +82,75 @@ export default class ColetaService {
         }
     }
 
+    static async updateById(model, photos) {
+        // transformar nos formatos necessários para o BD
+        let parsed_nc = model.numero_coleta ? parseInt(model.numero_coleta) : null;
+        let parsed_lt = model.latitude ? parseFloat(model.latitude) : null;
+        let parsed_lg = model.longitude ? parseFloat(model.longitude) : null;
+        let parsed_at = model.altitude ? parseFloat(model.altitude) : null;
+        let parsed_dh = model.data_hora.toISOString();
+
+        // salvar no BD
+        await this.updateData({
+            ...model,
+            numero_coleta: parsed_nc,
+            latitude: parsed_lt,
+            longitude: parsed_lg,
+            altitude: parsed_at,
+            data_hora: parsed_dh,
+        });
+
+        if(photos.length) {
+            let currentPhotos = await this.getPhotosListById(model.id);
+
+            let toRemove = currentPhotos.filter(
+                (item) => { return !photos.includes(item.uri); }
+            );
+            let assetsIdRemove = toRemove.map((item) => item.asset_id);
+            await MediaLibrary.deleteAssetsAsync(assetsIdRemove);
+            toRemove.forEach(async (item) => { 
+                await FotoService.deleteByAsset(item.asset_id);
+            });
+
+            let currentUris = currentPhotos.map(item => item.uri);
+            let toSave = photos.filter(
+                (item) => { return !currentUris.includes(item); }
+            );
+
+            let album = null;
+            for(let i=0; i<toSave.length; i++) {
+                let asset = await MediaLibrary.createAssetAsync(toSave[i]);
+                album = album ?? await MediaLibrary.getAlbumAsync('fotos_coletas');
+                await MediaLibrary.addAssetsToAlbumAsync([asset], album);
+                let movedAsset = await MediaLibrary.getAssetInfoAsync(asset);
+                await FotoService.create(movedAsset.uri, movedAsset.id, model.id);
+                if(i == 0) {
+                    await this.updateThumbnailById(movedAsset.uri, model.id);    
+                }
+            }
+        }
+        
+        // remove o diretório temp/
+        await FileService.deleteTempFile();
+
+        // atualizar numero de coleta
+        let nextNC = await ConfiguracaoService.findNextNumeroColeta();
+        if(parsed_nc >= parseInt(nextNC)) {
+            await ConfiguracaoService
+                .updateNextNumeroColeta(parseInt(parsed_nc+1));
+        }
+    }
+
     static async deleteById(id) {
+        let photos = await this.getPhotosListById(id);
+        if(photos) {
+            let assetIds = photos.map((photo) => {
+                return photo.asset_id;
+            });
+            await MediaLibrary.deleteAssetsAsync(assetIds);
+            await FotoService.deleteByColeta(id);
+        }
+
         const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
@@ -96,7 +165,7 @@ export default class ColetaService {
     }
 
     // TODO: Permitir alterar por valores escolhidos
-    static async updateById(model) {
+    static async updateData(model) {
         const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
@@ -125,7 +194,7 @@ export default class ColetaService {
                 tx.executeSql(
                     `UPDATE ${table} SET thumbnail = ? WHERE id = ?;`,
                     [thumbnail, id],
-                    null,
+                    () => resolve(true),
                     (txObj, error) => { console.log('Error', error); }
                 )
             })
@@ -200,10 +269,7 @@ export default class ColetaService {
             async (resolve, reject) => {
                 const photos = await FotoService.findByColeta(id);
                 if(photos && photos.length > 0) {
-                    const photosUris = photos.map((photo) => {
-                        return photo.uri;
-                    });
-                    resolve(photosUris);
+                    resolve(photos);
                 }
                 resolve([]);
             }

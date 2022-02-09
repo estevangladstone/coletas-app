@@ -24,7 +24,9 @@ const DadosScreen = (props) => {
                     { cancelable: true }
                 );
             });
-        let coletasCSV = jsonToCSV(coletas);
+
+        let filteredColetas = coletas.map(({thumbnail, id, ...attrs}) => attrs)
+        let coletasCSV = jsonToCSV(filteredColetas);
         let fileUri = await FileService.createCacheFile('database_export.csv', coletasCSV);
 
         let canShare = await Sharing.isAvailableAsync()

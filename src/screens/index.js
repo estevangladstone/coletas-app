@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { Menu, Pressable, HamburgerIcon, Box, Spacer } from 'native-base';
+import { TouchableOpacity } from 'react-native';
+import { Menu, HamburgerIcon } from 'native-base';
 
 import ListarColetaScreen from './coletas/listar.screen';
 import EditarColetaScreen from './coletas/editar.screen';
@@ -17,14 +18,13 @@ const MenuOptions = (props) => {
 		<Menu 
 			w="190"
 			trigger={(triggerProps) => 
-				(<Pressable 
-					mr="8"
+				(<TouchableOpacity 
+					style={{ marginLeft: '-10%', paddingRight:'20%' }}
 					accessibilityLabel="Menu de navegação" {...triggerProps}>
 					<HamburgerIcon size="sm" style={{ color:'white'}}/>
-				</Pressable>)
+				</TouchableOpacity>)
 			}>
 			<Menu.Item onPress={() => props.navigation.navigate('Listar')}>Coletas</Menu.Item>
-			{/*<Menu.Item onPress={() => props.navigation.navigate('Projetos')}>Projetos</Menu.Item>*/}
 			<Menu.Item onPress={() => props.navigation.navigate('Dados')}>Exportar Dados</Menu.Item>
 			<Menu.Item onPress={() => props.navigation.navigate('Configuracoes')}>Configurações</Menu.Item>
 			<Menu.Item onPress={() => props.navigation.navigate('Sobre')}>Sobre</Menu.Item>
@@ -75,10 +75,6 @@ const NavigationStack = () => {
 	            name="Camera" 
 	            component={ CameraScreen }
 	            options={{ title:'', headerShown:false }} />
-	        {/*<Stack.Screen 
-	            name="Projetos" 
-	            component={ ListarProjetosScreen }
-	            options={{ title:'Projetos' }} />*/}
 	    </Stack.Navigator>
 	);
 }

@@ -28,7 +28,7 @@ const CriarColetaScreen = (props) => {
     const [nextNumeroColeta, setNextNumeroColeta] = useState(null);
 
     useEffect(async () => {
-        await FileService.deleteTempFiles();
+        await FileService.deleteTempFile();
         
         const numCol = await ConfiguracaoService.findNextNumeroColeta();
         const coletor = await ConfiguracaoService.findNomeColetor();
@@ -124,7 +124,7 @@ const CriarColetaScreen = (props) => {
             [
                 { text: "NÃO", style: "cancel" },
                 { text: "SIM", onPress: async () => {
-                    await FileService.deleteTempFiles();
+                    await FileService.deleteTempFile();
                     props.navigation.goBack();
                 }, style: "destructive" },
             ],
@@ -267,7 +267,13 @@ const CriarColetaScreen = (props) => {
                     setValue={(value) => setColeta({...coleta, observacoes:value})}/>
 
                 <Button 
-                    size="lg" mt="2" colorScheme="green"
+                    isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                    _loading={{
+                        bg: "green",
+                        _text: { color: "white" }
+                    }}
+                    _spinner={{ color: "white" }}
+                    isLoadingText="Salvando"
                     onPress={async () => await onSubmit()}>
                     Salvar
                 </Button>

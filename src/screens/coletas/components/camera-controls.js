@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import { Image } from 'react-native';
-import { 
-    FlatList, 
-    HStack,
-    Pressable,
-    Icon
-} from 'native-base';
+import { Image, TouchableOpacity } from 'react-native';
+import { FlatList, HStack, Icon } from 'native-base';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import PhotoModal from './photo-modal';
 import FileService from '../../../services/FileService';
@@ -26,16 +21,17 @@ const CameraControls = (props) => {
     }
 
     const deletePhoto = async (photoUri) => {
-        await FileService.deleteFile(photoUri, true);
+        if(props.isDisabled) { return null; }
+        await FileService.deleteTempFile(photoUri);
         props.removePhoto(photoUri);
     }
 
     return (
         <HStack mb="1">
             { props.isDisabled ? null :
-            <Pressable 
-                backgroundColor='muted.200'
+            <TouchableOpacity 
                 style={{
+                    backgroundColor:'#e5e5e5',
                     width: 100, 
                     height: 100, 
                     margin: 2,
@@ -49,13 +45,13 @@ const CameraControls = (props) => {
                     as={<MaterialCommunityIcons name="camera-plus" />}
                     size="10"
                 />
-            </Pressable> }
+            </TouchableOpacity> }
             <FlatList
                 horizontal={true}
                 style={{ marginLeft: 2 }}
                 data={props.photos}
                 renderItem={({item, index}) => (
-                    <Pressable onPress={() => {props.isDisabled ? null : showPhotoModal(item)}}>
+                    <TouchableOpacity onPress={() => showPhotoModal(item)}>
                         <Image 
                             alt={'fotografia '+index.toString()}
                             style={{ 
@@ -66,7 +62,7 @@ const CameraControls = (props) => {
                             }}
                             source={{ uri:item }}>
                         </Image>
-                    </Pressable>
+                    </TouchableOpacity>
                 )}
                 keyExtractor={(item, index) => index.toString()}
             >
@@ -74,8 +70,8 @@ const CameraControls = (props) => {
             <PhotoModal 
                 photo={selectedPhoto}
                 openModal={showModal} 
-                closeModal={() => closePhotoModal()} 
-                removePhoto={async () => await deletePhoto(selectedPhoto)}/>
+                closeModal={closePhotoModal} 
+                removePhoto={async () => await deletePhoto(selectedPhoto)} />
         </HStack>
     );
 }

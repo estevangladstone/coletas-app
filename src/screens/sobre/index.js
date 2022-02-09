@@ -8,7 +8,7 @@ import * as MediaLibrary from 'expo-media-library';
 const SobreScreen = (props) => {
 
     useEffect(async () => {
-        let t = await FotoService.findAll();
+        let t = await FotoService.findByColeta(1);
         console.log(t)
 
     }, []);
