@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, BackHandler, View, ScrollView } from 'react-native';
+import { Alert, BackHandler, View, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { 
     Heading, Button, VStack, HStack, Image, Icon, Divider    
@@ -38,7 +38,7 @@ const CriarColetaScreen = (props) => {
             ...coleta, 
             data_hora: new Date(),
             numero_coleta: numCol ? (parseInt(numCol)).toString() : '1',
-            coletores: coletor,
+            coletor_principal: coletor,
             pais: 'Brasil',
         });
     }, []);
@@ -148,141 +148,147 @@ const CriarColetaScreen = (props) => {
     }
 
     return (
-        <ScrollView  style={{flex: 1, backgroundColor:'#fff'}}>
-            <VStack mx="3" my="2">
+        <KeyboardAvoidingView style={{flex: 1}}>
+            <ScrollView style={{flex: 1, backgroundColor:'#fff'}}>
+                <VStack mx="3" my="2">
 
-                <CameraControls 
-                    photos={photoList} 
-                    openCamera={openCamera} 
-                    removePhoto={popPhoto} />
+                    <CameraControls 
+                        photos={photoList} 
+                        openCamera={openCamera} 
+                        removePhoto={popPhoto} />
+                        
+                    <ColetaDatetimeField
+                        value={coleta.data_hora}
+                        setValue={(value) => setColeta({...coleta, data_hora:value})}/>
+                    <ColetaTextField 
+                        label="Número da Coleta"
+                        value={coleta.numero_coleta}
+                        keyboardType="numeric"
+                        setValue={(value) => { 
+                            setColeta({...coleta, numero_coleta:value})
+                            setErrors({}) 
+                        }}
+                        isInvalid={'numero_coleta' in errors}
+                        errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+nextNumeroColeta}/>
+                    <ColetaTextField 
+                        label="Coletor principal"
+                        value={coleta.coletor_principal}
+                        setValue={(value) => setColeta({...coleta, coletor_principal:value})}/>
+                    <ColetaTextField 
+                        label="Outros coletores"
+                        value={coleta.outros_coletores}
+                        setValue={(value) => setColeta({...coleta, outros_coletores:value})}/>
+
+                    <Divider my="2" backgroundColor="#a3a3a3" />
+                    <Heading size="md" mb="2">Espécime</Heading>
+
+                    <ColetaTextField 
+                        label="Espécie"
+                        value={coleta.especie}
+                        setValue={(value) => setColeta({...coleta, especie:value})}/>
+                    <ColetaTextField 
+                        label="Família"
+                        value={coleta.familia}
+                        setValue={(value) => setColeta({...coleta, familia:value})}/>
+                    <ColetaTextField 
+                        label="Hábito de crescimento"
+                        value={coleta.habito_crescimento}
+                        setValue={(value) => setColeta({...coleta, habito_crescimento:value})}/>
+                    <ColetaTextAreaField 
+                        label="Descrição do Espécime"
+                        value={coleta.descricao_especime}
+                        helperText="Ex.: cor da flor ou fruto, odores, filotaxia, altura, etc."
+                        setValue={(value) => setColeta({...coleta, descricao_especime:value})}/>
+                    <ColetaTextField 
+                        label="Substrato"
+                        value={coleta.substrato}
+                        setValue={(value) => setColeta({...coleta, substrato:value})}/>
+                    <ColetaTextAreaField 
+                        label="Descrição do Local"
+                        value={coleta.descricao_local}
+                        setValue={(value) => setColeta({...coleta, descricao_local:value})}/>
+
+                    <Divider my="2" backgroundColor="#a3a3a3" />
+                    <Heading size="md" mb="2">Localização</Heading>
                     
-                <ColetaDatetimeField
-                    value={coleta.data_hora}
-                    setValue={(value) => setColeta({...coleta, data_hora:value})}/>
-                <ColetaTextField 
-                    label="Número da Coleta"
-                    value={coleta.numero_coleta}
-                    keyboardType="numeric"
-                    setValue={(value) => { 
-                        setColeta({...coleta, numero_coleta:value})
-                        setErrors({}) 
-                    }}
-                    isInvalid={'numero_coleta' in errors}
-                    errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+nextNumeroColeta}/>
-                <ColetaTextField 
-                    label="Coletor (ou Coletores)"
-                    value={coleta.coletores}
-                    setValue={(value) => setColeta({...coleta, coletores:value})}/>
+                    <HStack>
+                        <View style={{width: '85%'}}>
+                            <ColetaTextField 
+                                label="Longitude"
+                                value={coleta.longitude}
+                                setValue={(value) => { 
+                                    setColeta({ ...coleta, longitude:value })
+                                    setErrors({})
+                                }}
+                                keyboardType="numeric"
+                                isInvalid={'longitude' in errors}
+                                errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
+                            <ColetaTextField 
+                                label="Latitude"
+                                value={coleta.latitude}
+                                setValue={(value) => { 
+                                    setColeta({ ...coleta, latitude:value })
+                                    setErrors({})
+                                }}
+                                keyboardType="numeric"
+                                isInvalid={'latitude' in errors}
+                                errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
+                            <ColetaTextField 
+                                label="Altitude (em metros)"
+                                value={coleta.altitude}
+                                setValue={(value) => { 
+                                    setColeta({ ...coleta, altitude:value })
+                                    setErrors({})
+                                }}
+                                keyboardType="numeric"
+                                isInvalid={'altitude' in errors}
+                                errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
+                        </View>
 
-                <Divider my="2" backgroundColor="#a3a3a3" />
-                <Heading size="md" mb="2">Espécime</Heading>
+                        <LocationControls 
+                            setLocationData={(values) => setColeta({...coleta, ...values})} />
+                    </HStack>
 
-                <ColetaTextField 
-                    label="Espécie"
-                    value={coleta.especie}
-                    setValue={(value) => setColeta({...coleta, especie:value})}/>
-                <ColetaTextField 
-                    label="Família"
-                    value={coleta.familia}
-                    setValue={(value) => setColeta({...coleta, familia:value})}/>
-                <ColetaTextField 
-                    label="Hábito de crescimento"
-                    value={coleta.habito_crescimento}
-                    setValue={(value) => setColeta({...coleta, habito_crescimento:value})}/>
-                <ColetaTextAreaField 
-                    label="Descrição do Espécime"
-                    value={coleta.descricao_especime}
-                    helperText="Ex.: cor da flor ou fruto, odores, filotaxia, altura, etc."
-                    setValue={(value) => setColeta({...coleta, descricao_especime:value})}/>
-                <ColetaTextField 
-                    label="Substrato"
-                    value={coleta.substrato}
-                    setValue={(value) => setColeta({...coleta, substrato:value})}/>
-                <ColetaTextAreaField 
-                    label="Descrição do Local"
-                    value={coleta.descricao_local}
-                    setValue={(value) => setColeta({...coleta, descricao_local:value})}/>
+                    <ColetaTextField 
+                        label="País"
+                        value={coleta.pais}
+                        setValue={(value) => setColeta({...coleta, pais:value})}/>
+                    <ColetaTextField 
+                        label="Estado"
+                        value={coleta.estado}
+                        setValue={(value) => setColeta({...coleta, estado:value})}/>
+                    <ColetaTextAreaField 
+                        label="Localidade"
+                        value={coleta.localidade}
+                        setValue={(value) => {
+                            setColeta({...coleta, localidade:value});
+                        }}/>
 
-                <Divider my="2" backgroundColor="#a3a3a3" />
-                <Heading size="md" mb="2">Localização</Heading>
-                
-                <HStack>
-                    <View style={{width: '85%'}}>
-                        <ColetaTextField 
-                            label="Longitude"
-                            value={coleta.longitude}
-                            setValue={(value) => { 
-                                setColeta({ ...coleta, longitude:value })
-                                setErrors({})
-                            }}
-                            keyboardType="numeric"
-                            isInvalid={'longitude' in errors}
-                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
-                        <ColetaTextField 
-                            label="Latitude"
-                            value={coleta.latitude}
-                            setValue={(value) => { 
-                                setColeta({ ...coleta, latitude:value })
-                                setErrors({})
-                            }}
-                            keyboardType="numeric"
-                            isInvalid={'latitude' in errors}
-                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
-                        <ColetaTextField 
-                            label="Altitude (em metros)"
-                            value={coleta.altitude}
-                            setValue={(value) => { 
-                                setColeta({ ...coleta, altitude:value })
-                                setErrors({})
-                            }}
-                            keyboardType="numeric"
-                            isInvalid={'altitude' in errors}
-                            errorMessage="O campo permite apenas números, pontos ou sinal negativo."/>
-                    </View>
+                    <Divider my="2" backgroundColor="#a3a3a3" />
 
-                    <LocationControls 
-                        setLocationData={(values) => setColeta({...coleta, ...values})} />
-                </HStack>
+                    <ColetaTextAreaField 
+                        label="Observações"
+                        value={coleta.observacoes}
+                        setValue={(value) => setColeta({...coleta, observacoes:value})}/>
 
-                <ColetaTextField 
-                    label="País"
-                    value={coleta.pais}
-                    setValue={(value) => setColeta({...coleta, pais:value})}/>
-                <ColetaTextField 
-                    label="Estado"
-                    value={coleta.estado}
-                    setValue={(value) => setColeta({...coleta, estado:value})}/>
-                <ColetaTextAreaField 
-                    label="Localidade"
-                    value={coleta.localidade}
-                    setValue={(value) => {
-                        setColeta({...coleta, localidade:value});
-                    }}/>
-
-                <Divider my="2" backgroundColor="#a3a3a3" />
-
-                <ColetaTextAreaField 
-                    label="Observações"
-                    value={coleta.observacoes}
-                    setValue={(value) => setColeta({...coleta, observacoes:value})}/>
-
-                <Button 
-                    isLoading={isLoading} size="lg" mt="2" colorScheme="green"
-                    _loading={{
-                        bg: "green",
-                        _text: { color: "white" }
-                    }}
-                    _spinner={{ color: "white" }}
-                    isLoadingText="Salvando"
-                    onPress={async () => await onSubmit()}>
-                    Salvar
-                </Button>
-                <Button size="lg" colorScheme="danger" variant="ghost" mt="2"
-                    onPress={confirmExit}>
-                    Sair
-                </Button>
-            </VStack>
-        </ScrollView>);
+                    <Button 
+                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                        _loading={{
+                            bg: "green",
+                            _text: { color: "white" }
+                        }}
+                        _spinner={{ color: "white" }}
+                        isLoadingText="Salvando"
+                        onPress={async () => await onSubmit()}>
+                        Salvar
+                    </Button>
+                    <Button size="lg" colorScheme="danger" variant="outline" mt="2"
+                        onPress={confirmExit}>
+                        Cancelar
+                    </Button>
+                </VStack>
+            </ScrollView>
+        </KeyboardAvoidingView>);
 }
 
 export default CriarColetaScreen;

@@ -7,7 +7,7 @@ var db = null;
 
 export default class DatabaseInit {
 
-    constructor() {
+    async constructor() {
         DatabaseConnection.getConnection().then((connection) => {
             db = connection;
             this.InitDb();

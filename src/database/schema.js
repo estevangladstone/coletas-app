@@ -1,11 +1,12 @@
 const coletas = [
-    `DROP TABLE coletas`,
+    // `DROP TABLE IF EXISTS coletas`,
 
     `CREATE TABLE IF NOT EXISTS coletas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
     	data_hora TEXT,
     	numero_coleta INTEGER UNIQUE,
-    	coletores TEXT,
+        coletor_principal TEXT,
+        outros_coletores TEXT,
     	especie TEXT,
     	familia TEXT,
     	habito_crescimento TEXT,
@@ -24,17 +25,17 @@ const coletas = [
 ];
 
 const configuracoes = [
-    `DROP TABLE configuracoes`,
+    // `DROP TABLE IF EXISTS configuracoes`,
 
     `CREATE TABLE IF NOT EXISTS configuracoes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
     	nome TEXT,
     	valor TEXT
-	)`,
+	);`,
 ];
 
 const fotos = [
-    `DROP TABLE fotos`,
+    // `DROP TABLE IF EXISTS fotos`,
    
     `CREATE TABLE IF NOT EXISTS fotos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +43,7 @@ const fotos = [
         asset_id TEXT,
         coleta_id INTEGER,
         foreign key (coleta_id) references coletas (id)
-    )`,
+    );`,
 ];
 
 export const schema = [ ...coletas, ...configuracoes, ...fotos ];

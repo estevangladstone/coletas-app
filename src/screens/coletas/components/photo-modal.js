@@ -10,13 +10,10 @@ const PhotoModal = (props) => {
 
 	useEffect(() => {
 	    if(maxWidth && props.photo) {
-	        Image.getSize(props.photo, (width, height) => {
-	        	var ratio = maxWidth / width;
-	            setImageStyles({ 
-	            	width: parseInt(width*ratio),
-	            	height: parseInt(height*ratio)
-	            });
-	        });
+            setImageStyles({ 
+            	width: parseInt(maxWidth),
+            	height: parseInt(maxWidth*(4/3))
+            });
 	    }
 	}, [maxWidth, props.photo]);
 
@@ -36,34 +33,36 @@ const PhotoModal = (props) => {
                     	source={{uri:props.photo}}/>
                     }
 				</Modal.Body>
-				<Modal.Footer>
-					<Button.Group>
-						<Button 
-						    variant="ghost" 
-						    colorScheme="blueGray" 
-						    onPress={() => props.closeModal()}>
-						    Voltar
-						</Button>
-						{ !props.isDisabled ? 
-						<Button 
-							colorScheme="danger" 
-							onPress={() => {
-								Alert.alert(
-								    "Atenção",
-								    "Deseja mesmo remover a foto?",
-								    [
-								        { text: "NÃO", style: "cancel" },
-								        { text: "SIM", onPress: () => {
-											props.removePhoto();
-											props.closeModal();
-								        }, style: "destructive" },
-								    ],
-								    { cancelable: true }
-								);
-							}}>
-							Remover
-						</Button> : null }
-					</Button.Group>
+				<Modal.Footer style={{backgroundColor: 'transparent'}}>
+					<Button 
+						flex={1}
+					    size="lg"
+					    variant="subtle" 
+					    colorScheme="muted" 
+					    onPress={() => props.closeModal()}>
+					    Voltar
+					</Button>
+					{ !props.isDisabled ? 
+					<Button 
+						flex={1}
+						size="lg"
+						colorScheme="danger" 
+						onPress={() => {
+							Alert.alert(
+							    "Atenção",
+							    "Deseja mesmo remover a foto?",
+							    [
+							        { text: "NÃO", style: "cancel" },
+							        { text: "SIM", onPress: () => {
+										props.removePhoto();
+										props.closeModal();
+							        }, style: "destructive" },
+							    ],
+							    { cancelable: true }
+							);
+						}}>
+						Remover
+					</Button> : null }
 				</Modal.Footer>
 			</Modal.Content>
 		</Modal>

@@ -14,16 +14,16 @@ export default class ColetaService {
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
-                    `INSERT INTO ${table} (data_hora, coletores, numero_coleta, especie,
-                    familia, habito_crescimento, descricao_especime, substrato,
-                    descricao_local, latitude, longitude, altitude, pais, estado, localidade,
-                    observacoes) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, 
-                    [model.data_hora, model.coletores, model.numero_coleta, model.especie,
-                    model.familia, model.habito_crescimento, model.descricao_especime, 
-                    model.substrato, model.descricao_local, model.latitude, model.longitude,
-                    model.altitude, model.pais, model.estado, model.localidade, 
-                    model.observacoes],
+                    `INSERT INTO ${table} (data_hora, coletor_principal, outros_coletores,
+                    numero_coleta, especie, familia, habito_crescimento, descricao_especime,
+                    substrato, descricao_local, latitude, longitude, altitude, pais, estado,
+                    localidade, observacoes) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, 
+                    [model.data_hora, model.coletor_principal, model.outros_coletores,
+                    model.numero_coleta, model.especie, model.familia, 
+                    model.habito_crescimento, model.descricao_especime, model.substrato,
+                    model.descricao_local, model.latitude, model.longitude, model.altitude,
+                    model.pais, model.estado, model.localidade, model.observacoes],
                     async (txObj, { insertId, rows }) => { resolve(insertId) },
                     (txObj, error) => console.log('Error', error)
                 );
@@ -170,12 +170,13 @@ export default class ColetaService {
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
-                    `UPDATE ${table} SET data_hora = ?, coletores = ?, numero_coleta = ?,
-                    especie = ?, familia = ?, habito_crescimento = ?, descricao_especime = ?,
-                    substrato = ?, descricao_local = ?, latitude = ?, longitude = ?,
-                    altitude = ?, pais = ?, estado = ?, localidade = ?, observacoes = ?
+                    `UPDATE ${table} SET data_hora = ?, coletor_principal = ?,
+                    outros_coletores = ?, numero_coleta = ?, especie = ?, familia = ?,
+                    habito_crescimento = ?, descricao_especime = ?, substrato = ?,
+                    descricao_local = ?, latitude = ?, longitude = ?, altitude = ?,
+                    pais = ?, estado = ?, localidade = ?, observacoes = ?
                     WHERE id = ?;`,
-                    [model.data_hora, model.coletores, model.numero_coleta, model.especie,
+                    [model.data_hora, model.coletor_principal, model.outros_coletores, model.numero_coleta, model.especie,
                     model.familia, model.habito_crescimento, model.descricao_especime, 
                     model.substrato, model.descricao_local, model.latitude, model.longitude,
                     model.altitude, model.pais, model.estado, model.localidade, 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Alert, KeyboardAvoidingView } from 'react-native';
 import { ScrollView, VStack, Button, Divider, Heading } from 'native-base';
 import ColetaTextField from '../coletas/components/coleta-text-field';
 import ConfiguracaoService from '../../services/ConfiguracaoService';
@@ -97,6 +97,7 @@ const ConfiguracoesScreen = (props) => {
     }
 
     return (
+        <KeyboardAvoidingView style={{flex:1}}>
         <ScrollView flex={1} bg="#fff">
             <VStack mx="3" my="2">
                 <ColetaTextField 
@@ -105,10 +106,10 @@ const ConfiguracoesScreen = (props) => {
                     setValue={(value) => setConfiguracoes({...configuracoes, nome_coletor:value})}/>
                 <ColetaTextField 
                     label="Próximo número de Coleta"
-                    value={configuracoes.proximo_numero_coleta ? configuracoes.proximo_numero_coleta.toString() : ''}
+                    value={configuracoes.proximo_numero_coleta ? parseInt(configuracoes.proximo_numero_coleta).toString() : ''}
                     keyboardType="numeric"
                     setValue={(value) => { 
-                        setConfiguracoes({...configuracoes, proximo_numero_coleta:value})
+                        setConfiguracoes({...configuracoes, proximo_numero_coleta:parseInt(value)})
                         setIsNumInvalid(false)
                     }}
                     isInvalid={isNumInvalid}
@@ -127,7 +128,7 @@ const ConfiguracoesScreen = (props) => {
                 </Button>
             </VStack>
         </ScrollView>
-    );
+    </KeyboardAvoidingView>);
 
 }
 

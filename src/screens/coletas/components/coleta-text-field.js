@@ -24,6 +24,8 @@ const ColetaTextField = (props) => {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 editable={!props.isDisabled}
+                focus={props.startEditing}
+                onSubmitEditing={props.nexStep}
                 />
             { props.isInvalid &&
             <Text style={styles.input_error_message}>{props.errorMessage}</Text> }

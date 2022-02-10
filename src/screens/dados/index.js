@@ -10,7 +10,6 @@ import * as Sharing from 'expo-sharing';
 const DadosScreen = (props) => {
 
     const [isLoadingDatabase, setIsLoadingDatabase] = useState(false);
-    // const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
 
     const exportDatabase = async () => {
         setIsLoadingDatabase(true);
@@ -25,36 +24,45 @@ const DadosScreen = (props) => {
                 );
             });
 
-        let filteredColetas = coletas.map(({thumbnail, id, ...attrs}) => attrs)
-        let coletasCSV = jsonToCSV(filteredColetas);
-        let fileUri = await FileService.createCacheFile('database_export.csv', coletasCSV);
+        if(coletas.length) {
+            let filteredColetas = coletas.map(({thumbnail, id, ...attrs}) => attrs)
+            let coletasCSV = jsonToCSV(filteredColetas);
+            let fileUri = await FileService.createCacheFile('database_export.csv', coletasCSV);
 
-        let canShare = await Sharing.isAvailableAsync()
-            .catch((error) => {
+            let canShare = await Sharing.isAvailableAsync()
+                .catch((error) => {
+                    Alert.alert(
+                        "Erro",
+                        "Não foi possível obter permissões para realizar o compartilhamento do arquivo.",
+                        [{ text: "OK", style: "default" }],
+                        { cancelable: true }
+                    );
+                });
+
+            if(canShare) {
+                Sharing.shareAsync(fileUri)
+                    .catch((error) =>  
+                        Alert.alert(
+                            "Erro",
+                            "Algum erro ocorreu e não foi possível realizar o compartilhamento.",
+                            [{ text: "OK", style: "default" }],
+                            { cancelable: true }
+                        ));
+            } else {
                 Alert.alert(
                     "Erro",
-                    "Não foi possível obter permissões para realizar o compartilhamento do arquivo.",
+                    "Algum erro ocorreu e não foi possível realizar o compartilhamento.",
+                    [{ text: "OK", style: "default" }],
+                    { cancelable: true }
+                )
+            }
+        } else {
+            Alert.alert(
+                    "Aviso",
+                    "Não existem registros de Coleta no banco de dados.",
                     [{ text: "OK", style: "default" }],
                     { cancelable: true }
                 );
-            });
-
-        if(canShare) {
-            Sharing.shareAsync(fileUri)
-                .catch((error) =>  
-                    Alert.alert(
-                        "Erro",
-                        "Algum erro ocorreu e não foi possível realizar o compartilhamento.",
-                        [{ text: "OK", style: "default" }],
-                        { cancelable: true }
-                    ));
-        } else {
-            Alert.alert(
-                "Erro",
-                "Algum erro ocorreu e não foi possível realizar o compartilhamento.",
-                [{ text: "OK", style: "default" }],
-                { cancelable: true }
-            )
         }
         setIsLoadingDatabase(false);
     }
