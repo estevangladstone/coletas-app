@@ -5,6 +5,7 @@ import FileService from '../../services/FileService';
 import ColetaService from '../../services/ColetaService';
 import { jsonToCSV } from 'react-native-csv';
 import * as Sharing from 'expo-sharing';
+import { formatColetaData } from '../../helpers';
 
 
 const DadosScreen = (props) => {
@@ -25,7 +26,12 @@ const DadosScreen = (props) => {
             });
 
         if(coletas.length) {
-            let filteredColetas = coletas.map(({thumbnail, id, ...attrs}) => attrs)
+            // TODO: Mapear os dados para o formato de saída
+
+            let filteredColetas = coletas.map((item) => {
+                return formatColetaData(item);
+            });
+            
             let coletasCSV = jsonToCSV(filteredColetas);
             let fileUri = await FileService.createCacheFile('database_export.csv', coletasCSV);
 
@@ -68,11 +74,11 @@ const DadosScreen = (props) => {
     }
 
     return (
-        <ScrollView flex={1} bg="#fff">
+        <ScrollView flex={1} bg="#fafafa">
             <VStack mx="3" my="2">
                 <Heading size="md" mb="1">Exportar Banco de Dados</Heading>
-                <Text my="1">
-                    Exportar as anotações de coletas presentes no Banco de Dados do aplicativo em formato CSV.
+                <Text my="1" style={{ textAlign:'justify' }}>
+                    Exportar os registros de coletas presentes no Banco de Dados do aplicativo em formato CSV.
                 </Text>
                 <Button 
                     isLoading={isLoadingDatabase} size="lg" my="1" colorScheme="green"
@@ -85,6 +91,12 @@ const DadosScreen = (props) => {
                     onPress={() => exportDatabase()}>
                     Gerar arquivo CSV
                 </Button>
+            
+                <Divider my="2" backgroundColor="#a3a3a3" />
+                <Heading size="md" mb="1">Fotos de Coletas</Heading>
+                <Text my="1" style={{ textAlign:'justify' }}>
+                    Todas as fotografias associadas a registros de coleta são armazenadas no álbum "adCollectio", localizado na galeria do dispositivo.
+                </Text>
             </VStack>
         </ScrollView>
     );

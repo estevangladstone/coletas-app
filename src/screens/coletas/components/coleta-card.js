@@ -1,10 +1,6 @@
 import React from 'react';
-import { 
-    View, Image 
-} from 'react-native';
-import { 
-    Box, VStack, HStack, Spacer, Text, Pressable, Icon, Heading
-} from 'native-base';
+import { View, Image } from 'react-native';
+import { Box, VStack, HStack, Spacer, Text, Pressable, Icon, Heading } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatDatetime } from '../../../helpers';
 

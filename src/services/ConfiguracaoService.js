@@ -1,5 +1,6 @@
 import { DatabaseConnection } from '../database/DatabaseConnection';
 
+
 const table = "configuracoes";
 
 export default class ConfiguracaoService {

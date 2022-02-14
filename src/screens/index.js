@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native';
 import { Menu, HamburgerIcon } from 'native-base';
 
 import ListarColetaScreen from './coletas/listar.screen';
-import EditarColetaScreen from './coletas/editar.screen';
+import VisualizarColetaScreen from './coletas/visualizar.screen';
 import CriarColetaScreen from './coletas/criar.screen';
 import CameraScreen from './coletas/camera.screen';
 import DadosScreen from './dados/';
@@ -56,9 +56,11 @@ const NavigationStack = () => {
 	            component={ CriarColetaScreen }
 	            options={{ title:'Nova Coleta' }} />
 	        <Stack.Screen 
-	            name="Editar" 
-	            component={ EditarColetaScreen }
-	            options={{ title:'Editar Coleta' }} />
+	            name="Visualizar" 
+	            component={ VisualizarColetaScreen }
+	            options={(props) => {
+	             return {title:props.route.params.title}; 
+	         	}} />
 	        <Stack.Screen 
 	            name="Configuracoes" 
 	            component={ ConfiguracoesScreen }

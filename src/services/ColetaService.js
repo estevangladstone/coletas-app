@@ -34,18 +34,12 @@ export default class ColetaService {
     static async create(model, photos) {
         // transformar nos formatos necessários para o BD
         let parsed_nc = model.numero_coleta ? parseInt(model.numero_coleta) : null;
-        let parsed_lt = model.latitude ? parseFloat(model.latitude) : null;
-        let parsed_lg = model.longitude ? parseFloat(model.longitude) : null;
-        let parsed_at = model.altitude ? parseFloat(model.altitude) : null;
         let parsed_dh = model.data_hora.toISOString();
 
         // salvar no BD
         let coletaId = await this.addData({
             ...model,
             numero_coleta: parsed_nc,
-            latitude: parsed_lt,
-            longitude: parsed_lg,
-            altitude: parsed_at,
             data_hora: parsed_dh,
         });
 
@@ -85,18 +79,12 @@ export default class ColetaService {
     static async updateById(model, photos) {
         // transformar nos formatos necessários para o BD
         let parsed_nc = model.numero_coleta ? parseInt(model.numero_coleta) : null;
-        let parsed_lt = model.latitude ? parseFloat(model.latitude) : null;
-        let parsed_lg = model.longitude ? parseFloat(model.longitude) : null;
-        let parsed_at = model.altitude ? parseFloat(model.altitude) : null;
         let parsed_dh = model.data_hora.toISOString();
 
         // salvar no BD
         await this.updateData({
             ...model,
             numero_coleta: parsed_nc,
-            latitude: parsed_lt,
-            longitude: parsed_lg,
-            altitude: parsed_at,
             data_hora: parsed_dh,
         });
 

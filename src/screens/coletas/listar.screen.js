@@ -7,7 +7,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { 
     Box, Heading, Button, FlatList, VStack, Fab, Icon, Text, Center, Spinner
 } from 'native-base';
-import CameraScreen from './camera.screen';
 
 
 const ListarColetaScreen = (props) => {
@@ -53,7 +52,7 @@ const ListarColetaScreen = (props) => {
     }
 
     return (
-        <Box flex={1} bg="#fff">
+        <Box flex={1} bg="#fafafa">
             <VStack space={2} flex={1}>
                 { coletas.length > 0 ?
                 <Box flex={1}>
@@ -63,7 +62,10 @@ const ListarColetaScreen = (props) => {
                         onEndReachedThreshold={0}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => props.navigation.navigate('Editar', { id:item.id })}>
+                                onPress={() => props.navigation.navigate('Visualizar', { 
+                                    id: item.id,
+                                    title: item.numero_coleta ? 'Coleta #'+item.numero_coleta : 'Coleta S/N'
+                                })}>
                                 <ColetaCard item={item} />
                             </TouchableOpacity>
                         )}

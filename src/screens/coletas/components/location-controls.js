@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { MaterialIcons } from "@expo/vector-icons";
 
 
-const ColetaLocationControls = (props) => {
+const LocationControls = (props) => {
 
     const [buttonLoading, setButtonLoading] = useState(false);
     const [currentLocation, setCurrentLocation] = useState({});
@@ -75,4 +75,4 @@ const ColetaLocationControls = (props) => {
 
 }
 
-export default ColetaLocationControls;
+export default LocationControls;

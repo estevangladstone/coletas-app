@@ -4,7 +4,7 @@ import { View, Text } from 'react-native';
 const SobreScreen = (props) => {
 
     return (
-        <View style={{flex:1, backgroundColor: '#fff'}}>
+        <View style={{flex:1, backgroundColor: '#fafafa'}}>
             <View style={{ marginVertical: '2%', marginHorizontal: '3%' }}>
                 <Text style={{ fontSize:20, fontWeight:'bold', marginBottom: '1%' }}>Sobre</Text>
                 <Text style={{ marginVertical: 1, fontSize:16 }}>

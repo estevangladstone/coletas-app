@@ -1,6 +1,3 @@
-import ColetaService from '../services/ColetaService';
-
-
 export default class Coleta {
 
     constructor(id=null, data_hora=null, coletor_principal=null, outros_coletores=null, 

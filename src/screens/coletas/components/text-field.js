@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { TextInput, View, Text, StyleSheet } from 'react-native';
 
-const ColetaTextAreaField = (props) => {
+const TextField = (props) => {
 
     const [isFocused, setIsFocused] = useState(false);
 
@@ -12,24 +12,23 @@ const ColetaTextAreaField = (props) => {
             <Text style={styles.input_helper}>{props.helperText}</Text> }
             <TextInput
                 style={[
-                    styles.input_textarea, 
+                    styles.input_field, 
                     props.isInvalid ? styles.input_field__invalid : null,
                     props.isDisabled ? styles.input_field__disabled : null,
                     isFocused ? styles.input_field__active : null,
                 ]}
                 placeholder={props.placeholder}
-                multiline={true}
-                numberOfLines={8}
                 value={props.value}
                 keyboardType={props.keyboardType}
                 onChangeText={(value) => props.setValue(value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 editable={!props.isDisabled}
+                focus={props.startEditing}
+                onSubmitEditing={props.nexStep}
                 />
-
             { props.isInvalid &&
-            <Text style={styles.input_error}>{props.errorMessage}</Text> }
+            <Text style={styles.input_error_message}>{props.errorMessage}</Text> }
         </View>
     );
 
@@ -49,8 +48,7 @@ const styles = StyleSheet.create({
         color: '#727272',
         paddingBottom: 5,
     },
-    input_textarea: {
-        height: 90,
+    input_field: {
         borderRadius: 4,
         backgroundColor: '#e5e5e5',
         padding: '2%',
@@ -58,8 +56,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'black',
         borderColor: 'transparent',
-        borderWidth: 1,
-        textAlignVertical: 'top',
+        borderWidth: 1
     },
     input_field__active: {
         borderColor: 'black',
@@ -78,4 +75,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ColetaTextAreaField;
+export default TextField;

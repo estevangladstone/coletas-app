@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {View, Button, Platform, Text} from 'react-native';
-import { 
-    FormControl,
-    Input,
-    Icon,
-    HStack,
-    Pressable,
-} from 'native-base';
+import { View, Button, Platform, Text } from 'react-native';
+import { FormControl, Input, Icon, HStack, Pressable } from 'native-base';
 import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const ColetaDatetimeField = (props) => {
+const DatetimeField = (props) => {
 
     const [maskedDate, setMaskedDate] = useState('');
     const [maskedTime, setMaskedTime] = useState('');
@@ -95,4 +89,4 @@ const ColetaDatetimeField = (props) => {
     );
 }
 
-export default ColetaDatetimeField;
+export default DatetimeField;
