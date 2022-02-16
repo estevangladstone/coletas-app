@@ -12,7 +12,6 @@ import {
 const ListarColetaScreen = (props) => {
 
     const [coletas, setColetas] = useState([]);
-    const [startCamera, setStartCamera] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [haveMore, setHaveMore] = useState(true);
     const isFocused = useIsFocused();

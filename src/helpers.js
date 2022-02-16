@@ -13,6 +13,23 @@ const formatDatetime = (datetime) => {
 	return diaFull+'/'+mesFull+'/'+anoFull+' às '+horaFull+':'+minutosFull;
 }
 
+const generatePhotoName = (coletor, numero, index) => {
+    let parsedNome = coletor.split(' ')[0]; 
+
+    let parsedNum = numero ? numero : 'SN';
+
+    let parsedDate = new Date(),
+        dia  = parsedDate.getDate().toString(),
+        diaFull = (dia.length == 1) ? '0'+dia : dia,
+        mes  = (parsedDate.getMonth()+1).toString(),
+        mesFull = (mes.length == 1) ? '0'+mes : mes,
+        anoFull = parsedDate.getFullYear();
+
+    let parsedIndex = String(index).padStart(3, '0')
+
+    return parsedNome+'_'+parsedNum+'_'+diaFull+mesFull+anoFull+'_'+parsedIndex+'.jpg';
+}
+
 const formatColetaData = (model) => {
     
     let parsedDate = new Date(model.data_hora),
@@ -50,4 +67,4 @@ const formatColetaData = (model) => {
     }
 }
 
-export { formatDatetime, formatColetaData };
+export { formatDatetime, formatColetaData, generatePhotoName };

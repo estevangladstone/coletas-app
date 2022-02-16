@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import { generatePhotoName } from '../helpers';
 
 
 export default class FileService {
@@ -21,7 +22,7 @@ export default class FileService {
 			let time = (new Date).getTime().toString();
 			await FileSystem.moveAsync({
 				from: fileUri,
-				to: FileSystem.cacheDirectory+'temp/'+time+'.jpeg' 
+				to: FileSystem.cacheDirectory+'temp/'+time+'.jpg' 
 			});
 			return true;
 		} else {
@@ -53,6 +54,25 @@ export default class FileService {
 		} else {
 			await FileSystem.deleteAsync(FileSystem.cacheDirectory+'temp', { idempotent:true });
 		}
+	}
+
+	static async renamePhotos(coletor, numero, startIndex) {
+		if(!(await FileSystem.getInfoAsync(FileSystem.cacheDirectory+'temp')).exists) {
+		    return [];
+		}
+
+		let list = await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory+'temp');
+		list.forEach(async (itemUri,index) => {
+			let fileName = generatePhotoName(coletor, numero, startIndex+index);
+			FileSystem.moveAsync({
+				from: FileSystem.cacheDirectory+'temp/'+itemUri,
+				to: FileSystem.cacheDirectory+'temp/'+fileName
+			});
+		});
+		let list2 = await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory+'temp');
+		return list2.map(item => {
+			return FileSystem.cacheDirectory+'temp/'+item;
+		});
 	}
 
 }

@@ -45,9 +45,11 @@ export default class ColetaService {
 
         if(coletaId) {
             if(photos.length) {
+                let newPhotos = await FileService.renamePhotos(model.coletor_principal, parsed_nc, 1);
+
                 let album = await MediaLibrary.getAlbumAsync('fotos_coletas');
-                for(let i=0; i<photos.length; i++) {
-                    let asset = await MediaLibrary.createAssetAsync(photos[i]);
+                for(let i=0; i<newPhotos.length; i++) {
+                    let asset = await MediaLibrary.createAssetAsync(newPhotos[i]);
                     if(!album) {
                         album = await MediaLibrary.createAlbumAsync('fotos_coletas', asset);
                     } else {
@@ -99,15 +101,12 @@ export default class ColetaService {
             toRemove.forEach(async (item) => { 
                 await FotoService.deleteByAsset(item.asset_id);
             });
-
-            let currentUris = currentPhotos.map(item => item.uri);
-            let toSave = photos.filter(
-                (item) => { return !currentUris.includes(item); }
-            );
+            
+            let newPhotos = await FileService.renamePhotos(model.coletor_principal, parsed_nc, currentPhotos.length+1);
 
             let album = null;
-            for(let i=0; i<toSave.length; i++) {
-                let asset = await MediaLibrary.createAssetAsync(toSave[i]);
+            for(let i=0; i<newPhotos.length; i++) {
+                let asset = await MediaLibrary.createAssetAsync(newPhotos[i]);
                 album = album ?? await MediaLibrary.getAlbumAsync('fotos_coletas');
                 await MediaLibrary.addAssetsToAlbumAsync([asset], album);
                 let movedAsset = await MediaLibrary.getAssetInfoAsync(asset);
