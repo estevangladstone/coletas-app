@@ -16,7 +16,7 @@ import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
 
 
-const VisualizarColetaScreen = (props) => {
+const EditarColetaScreen = (props) => {
 
     const [coleta, setColeta] = useState({});
     const [errors, setErrors] = useState({});
@@ -40,7 +40,7 @@ const VisualizarColetaScreen = (props) => {
                 setColeta({
                     ...response._array[0],
                     data_hora: new Date(col.data_hora),
-                    numero_coleta: col.numero_coleta.toString()
+                    numero_coleta: col.numero_coleta ? col.numero_coleta.toString() : '' 
                 });
                 setCurrNumeroColeta(col.numero_coleta);
             }
@@ -103,8 +103,6 @@ const VisualizarColetaScreen = (props) => {
             setIsLoading(false);
             return false;
         } 
-        
-
 
         ColetaService.updateById(
             coleta, photoList 
@@ -347,4 +345,4 @@ const VisualizarColetaScreen = (props) => {
         </KeyboardAvoidingView>);
 }
 
-export default VisualizarColetaScreen;
+export default EditarColetaScreen;

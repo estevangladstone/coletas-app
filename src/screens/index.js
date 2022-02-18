@@ -4,12 +4,15 @@ import { TouchableOpacity } from 'react-native';
 import { Menu, HamburgerIcon } from 'native-base';
 
 import ListarColetaScreen from './coletas/listar.screen';
-import VisualizarColetaScreen from './coletas/visualizar.screen';
+import EditarColetaScreen from './coletas/editar.screen';
 import CriarColetaScreen from './coletas/criar.screen';
 import CameraScreen from './coletas/camera.screen';
 import DadosScreen from './dados/';
 import ConfiguracoesScreen from './configuracoes/';
 import SobreScreen from './sobre/';
+import ListarProjetoScreen from './projetos/listar.screen';
+import CriarProjetoScreen from './projetos/criar.screen';
+import EditarProjetoScreen from './projetos/editar.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +28,7 @@ const MenuOptions = (props) => {
 				</TouchableOpacity>)
 			}>
 			<Menu.Item onPress={() => props.navigation.navigate('Listar')}>Coletas</Menu.Item>
+			<Menu.Item onPress={() => props.navigation.navigate('Projetos')}>Projetos</Menu.Item>
 			<Menu.Item onPress={() => props.navigation.navigate('Dados')}>Exportar Dados</Menu.Item>
 			<Menu.Item onPress={() => props.navigation.navigate('Configuracoes')}>Configurações</Menu.Item>
 			<Menu.Item onPress={() => props.navigation.navigate('Sobre')}>Sobre</Menu.Item>
@@ -56,10 +60,10 @@ const NavigationStack = () => {
 	            component={ CriarColetaScreen }
 	            options={{ title:'Nova Coleta' }} />
 	        <Stack.Screen 
-	            name="Visualizar" 
-	            component={ VisualizarColetaScreen }
+	            name="Editar" 
+	            component={ EditarColetaScreen }
 	            options={(props) => {
-	             return {title:props.route.params.title}; 
+	            	return {title:props.route.params.title}; 
 	         	}} />
 	        <Stack.Screen 
 	            name="Configuracoes" 
@@ -77,6 +81,20 @@ const NavigationStack = () => {
 	            name="Camera" 
 	            component={ CameraScreen }
 	            options={{ title:'', headerShown:false }} />
+	        <Stack.Screen 
+	            name="Projetos" 
+	            component={ ListarProjetoScreen }
+	            options={{ title:'Projetos' }} />
+	        <Stack.Screen 
+	            name="CriarProjeto" 
+	            component={ CriarProjetoScreen }
+	            options={{ title:'Novo Projeto' }} />
+	        <Stack.Screen 
+	            name="EditarProjeto" 
+	            component={ EditarProjetoScreen }
+	            options={(props) => {
+	            	return {title:props.route.params.title}; 
+	         	}} />
 	    </Stack.Navigator>
 	);
 }

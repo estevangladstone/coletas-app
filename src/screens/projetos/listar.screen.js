@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
-import ColetaService from '../../services/ColetaService';
-import ColetaCard from './components/coleta-card';
 import { MaterialIcons } from "@expo/vector-icons";
 import { 
-    Box, Heading, Button, FlatList, VStack, Fab, Icon, Text, Center, Spinner
+    Heading, Button, FlatList, VStack, Fab, Icon, Center, Spinner, Text
 } from 'native-base';
+import ProjetoService from '../../services/ProjetoService';
+import ProjetoCard from './components/projeto-card';
 
 
-const ListarColetaScreen = (props) => {
+const ListarProjetoScreen = (props) => {
 
-    const [coletas, setColetas] = useState([]);
+    const [projetos, setProjetos] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [haveMore, setHaveMore] = useState(true);
     const isFocused = useIsFocused();
@@ -25,57 +25,57 @@ const ListarColetaScreen = (props) => {
     }, [props.navigation]);
 
     const listar = () => {
-        ColetaService.fetchMore(7, 0)
+        ProjetoService.fetchMore(7, 0)
             .then(response => {
                 if(response.length == 0) {
                     setHaveMore(false);
                 }
-                setColetas(response);
+                setProjetos(response);
                 setIsLoading(false);
             });
-    }
+    };
 
     const fetchMore = () => {
         if(!haveMore) { return null }
             
         setIsLoading(true);    
-        ColetaService.fetchMore(5, coletas.length)
+        ProjetoService.fetchMore(5, projetos.length)
             .then(response => {
                 if(response.length == 0) {
                     setHaveMore(false);
                 } else {
-                    setColetas([...coletas, ...response]);
+                    setProjetos([...projetos, ...response]);
                 }
                 setIsLoading(false);
-            });   
+            });
     }
 
     return (
-        <Box flex={1} bg="#fafafa">
+        <View flex={1} bg="#fafafa">
             <VStack space={2} flex={1}>
-                { coletas.length > 0 ?
-                <Box flex={1}>
+                { projetos.length > 0 ?
+                <View flex={1}>
                     <FlatList
-                        data={coletas}
+                        data={projetos}
                         onEndReached={() => fetchMore()}
                         onEndReachedThreshold={0}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => props.navigation.navigate('Editar', { 
+                                onPress={() => props.navigation.navigate('EditarProjeto', { 
                                     id: item.id,
-                                    title: item.numero_coleta ? 'Coleta #'+item.numero_coleta : 'Coleta S/N'
+                                    title: item.nome
                                 })}>
-                                <ColetaCard item={item} />
+                                <ProjetoCard item={item} />
                             </TouchableOpacity>
                         )}
                         keyExtractor={(item, index) => index.toString()}
                         ListFooterComponent={ isLoading ? <Spinner size="lg" p="2" color="green.500" /> : null }
                     />
-                </Box> : null }
-                { coletas.length == 0 && !haveMore ? 
+                </View> : null }
+                { projetos.length == 0 && !haveMore ? 
                 <Center my="3">
                     <Text fontSize="md">
-                    Não existem registros de Coletas cadastrados.</Text>
+                    Não existem Projetos cadastrados.</Text>
                 </Center> : null }
                 
                 { isFocused ?
@@ -91,15 +91,15 @@ const ListarColetaScreen = (props) => {
                             size="7"
                         />
                     }
-                    label="Nova Coleta"
-                    onPress={() => props.navigation.navigate('Criar')}
+                    label="Novo Projeto"
+                    onPress={() => props.navigation.navigate('CriarProjeto')}
                     renderInPortal={false}
                 />
                 : null }
             </VStack>
-        </Box>
+        </View>
     );
-
 }
 
-export default ListarColetaScreen;
+export default ListarProjetoScreen;
+

@@ -69,8 +69,9 @@ const CameraControls = (props) => {
             </FlatList>
             <PhotoModal 
                 photo={selectedPhoto}
-                openModal={showModal} 
-                closeModal={closePhotoModal} 
+                openModal={showModal}
+                closeModal={closePhotoModal}
+                isDisabled={props.isDisabled}
                 removePhoto={async () => await deletePhoto(selectedPhoto)} />
         </HStack>
     );

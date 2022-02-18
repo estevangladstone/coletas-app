@@ -46,4 +46,26 @@ const fotos = [
     );`,
 ];
 
-export const schema = [ ...coletas, ...configuracoes, ...fotos ];
+const projetos = [
+    // `DROP TABLE IF EXISTS projetos`,
+    
+    `CREATE TABLE IF NOT EXISTS projetos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT,
+        descricao TEXT,
+        created_at TEXT,
+        updated_at TEXT
+    );`,
+
+    // `DROP TABLE IF EXISTS projeto_coleta`,
+    
+    `CREATE TABLE IF NOT EXISTS projeto_coleta (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        projeto_id INTEGER,
+        coleta_id INTEGER,
+        foreign key (projeto_id) references projetos (id),
+        foreign key (coleta_id) references coletas (id)
+    );`,  
+];
+
+export const schema = [ ...coletas, ...configuracoes, ...fotos, ...projetos ];

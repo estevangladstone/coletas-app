@@ -98,37 +98,37 @@ const ConfiguracoesScreen = (props) => {
 
     return (
         <KeyboardAvoidingView style={{flex:1}}>
-        <ScrollView flex={1} bg="#fafafa">
-            <VStack mx="3" my="2">
-                <TextField 
-                    label="Nome de Coletor padrão"
-                    value={configuracoes.nome_coletor}
-                    setValue={(value) => setConfiguracoes({...configuracoes, nome_coletor:value})}/>
-                <TextField 
-                    label="Próximo número de Coleta"
-                    value={configuracoes.proximo_numero_coleta ? parseInt(configuracoes.proximo_numero_coleta).toString() : ''}
-                    keyboardType="numeric"
-                    setValue={(value) => { 
-                        setConfiguracoes({...configuracoes, proximo_numero_coleta:parseInt(value)})
-                        setIsNumInvalid(false)
-                    }}
-                    isInvalid={isNumInvalid}
-                    errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+parseInt(maxNumCol+1)}/>
+            <ScrollView flex={1} bg="#fafafa">
+                <VStack mx="3" my="2">
+                    <TextField 
+                        label="Nome de Coletor padrão"
+                        value={configuracoes.nome_coletor}
+                        setValue={(value) => setConfiguracoes({...configuracoes, nome_coletor:value})}/>
+                    <TextField 
+                        label="Próximo número de Coleta"
+                        value={configuracoes.proximo_numero_coleta ? parseInt(configuracoes.proximo_numero_coleta).toString() : ''}
+                        keyboardType="numeric"
+                        setValue={(value) => { 
+                            setConfiguracoes({...configuracoes, proximo_numero_coleta:parseInt(value)})
+                            setIsNumInvalid(false)
+                        }}
+                        isInvalid={isNumInvalid}
+                        errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+parseInt(maxNumCol+1)}/>
 
-                <Button 
-                    isLoading={isLoading} size="lg" mt="2" colorScheme="green"
-                    _loading={{
-                        bg: "green",
-                        _text: { color: "white" }
-                    }}
-                    _spinner={{ color: "white" }}
-                    isLoadingText="Salvando"
-                    onPress={onSubmit}>
-                    Salvar
-                </Button>
-            </VStack>
-        </ScrollView>
-    </KeyboardAvoidingView>);
+                    <Button 
+                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                        _loading={{
+                            bg: "green",
+                            _text: { color: "white" }
+                        }}
+                        _spinner={{ color: "white" }}
+                        isLoadingText="Salvando"
+                        onPress={onSubmit}>
+                        Salvar
+                    </Button>
+                </VStack>
+            </ScrollView>
+        </KeyboardAvoidingView>);
 
 }
 

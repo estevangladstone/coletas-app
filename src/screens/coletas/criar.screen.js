@@ -96,7 +96,7 @@ const CriarColetaScreen = (props) => {
                     [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }]);
             }
         }).catch((erro) => {
-            console.log(erro)
+            setIsLoading(false);
             Alert.alert(
                 "Erro",
                 "Ocorreu um problema ao tentar salvar o registro de Coleta.",
@@ -107,7 +107,7 @@ const CriarColetaScreen = (props) => {
     const confirmExit = () => {
         Alert.alert(
             "Atenção",
-            "Tem certeza que quer descartar os dados preenchidos (incluíndo fotos) e retornar a tela de Coletas?",
+            "Tem certeza que quer descartar os dados preenchidos (incluíndo fotos)?",
             [
                 { text: "NÃO", style: "cancel" },
                 { text: "SIM", onPress: async () => {

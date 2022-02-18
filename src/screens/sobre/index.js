@@ -1,7 +1,27 @@
+import React from 'react';
 import { View, Text } from 'react-native';
+import {DatabaseConnection} from '../../database/DatabaseConnection';
 
 
 const SobreScreen = (props) => {
+
+    // React.useEffect(async () => {
+    //     const db = await DatabaseConnection.getConnection();
+    //     db.transaction(tx => {
+    //         tx.executeSql(
+    //                 `CREATE TABLE IF NOT EXISTS projetos (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     nome TEXT,
+    //     descricao TEXT,
+    //     created_at TEXT,
+    //     updated_at TEXT
+    // );`,
+    //             null,
+    //             () => {console.log('ok')},
+    //             (txObj, error) => { console.log('Error', error); }
+    //         )
+    //     });
+    // }, []);
 
     return (
         <View style={{flex:1, backgroundColor: '#fafafa'}}>
