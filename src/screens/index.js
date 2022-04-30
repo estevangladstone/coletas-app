@@ -13,6 +13,7 @@ import SobreScreen from './sobre/';
 import ListarProjetoScreen from './projetos/listar.screen';
 import CriarProjetoScreen from './projetos/criar.screen';
 import EditarProjetoScreen from './projetos/editar.screen';
+import VisualizarProjetoScreen from './projetos/visualizar.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,6 +93,12 @@ const NavigationStack = () => {
 	        <Stack.Screen 
 	            name="EditarProjeto" 
 	            component={ EditarProjetoScreen }
+	            options={(props) => {
+	            	return {title:props.route.params.title}; 
+	         	}} />
+	        <Stack.Screen 
+	            name="VisualizarProjeto" 
+	            component={ VisualizarProjetoScreen }
 	            options={(props) => {
 	            	return {title:props.route.params.title}; 
 	         	}} />

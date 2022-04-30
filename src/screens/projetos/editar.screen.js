@@ -32,9 +32,6 @@ const EditarProjetoScreen = (props) => {
                 [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
             );
         });
-
-        // buscar coletas para associar ?
-        // buscar conforme escrever ??
     }, []);
 
     const validate = async () => {
@@ -92,57 +89,10 @@ const EditarProjetoScreen = (props) => {
         );
     }
 
-    const toggleEdit = () => {
-        if(canEdit) {
-            setCanEdit(false);
-        } else {
-            setCanEdit(true);
-        }
-    }
-
-    const removeProjeto = () => {
-        Alert.alert(
-            "Atenção",
-            "Tem certeza que deseja remover este Projeto?",
-            [
-                { text: "NÃO", style: "cancel" },
-                { text: "SIM", onPress: deleteProjeto, style: "destructive" },
-            ],
-            { cancelable: true }
-        );
-    }
-
-    const deleteProjeto = async () => {
-        ProjetoService.deleteById(projeto.id).then(() => {
-            Alert.alert(
-                "Sucesso",
-                "O Projeto foi removido com sucesso.",
-                [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
-            );
-        });
-    }
-
     return (
         <KeyboardAvoidingView style={{flex:1}}>
             <ScrollView flex={1} bg="#fafafa">
                 <VStack mx="3" my="2">
-                    <HStack style={{justifyContent: 'center'}}>
-                        <Button size="lg" mr="1" w="49%" colorScheme="green" 
-                            variant={canEdit ? "outline" : "subtle"}
-                            rightIcon={<Icon as={MaterialIcons} name={canEdit ? "edit-off" : "edit"} size="sm" />}
-                            onPress={() => toggleEdit()}>
-                            Editar
-                        </Button>
-                        <Button size="lg" ml="1" w="49%" colorScheme="danger" variant="subtle"
-                            rightIcon={<Icon as={MaterialIcons} name="delete" size="sm" />}
-                            onPress={() => removeProjeto()}>
-                            Remover
-                        </Button>
-                    </HStack>
-
-                    <Divider my="2" backgroundColor="#a3a3a3" />
-
-
                     <TextField 
                         label="Nome"
                         value={projeto.nome}
@@ -150,34 +100,28 @@ const EditarProjetoScreen = (props) => {
                             setProjeto({...projeto, nome:value});
                             setErrors({});
                         }}
-                        isDisabled={!canEdit}
                         isInvalid={'nome' in errors}
                         errorMessage={errors.nome}/>
                     <TextAreaField 
                         label="Descrição"
-                        isDisabled={!canEdit}
                         value={projeto.descricao}
                         setValue={(value) => setProjeto({...projeto, descricao:value})}/>
 
-                    { canEdit ?
-                    <View>
-                        <Button 
-                            isLoading={isLoading} size="lg" mt="2" colorScheme="green"
-                            _loading={{
-                                bg: "green",
-                                _text: { color: "white" }
-                            }}
-                            _spinner={{ color: "white" }}
-                            isLoadingText="Salvando"
-                            onPress={async () => await onSubmit()}>
-                            Salvar
-                        </Button>
-                        <Button size="lg" colorScheme="danger" variant="outline" mt="2"
-                            onPress={confirmExit}>
-                            Cancelar
-                        </Button>
-                    </View>
-                    : null }
+                    <Button 
+                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                        _loading={{
+                            bg: "green",
+                            _text: { color: "white" }
+                        }}
+                        _spinner={{ color: "white" }}
+                        isLoadingText="Salvando"
+                        onPress={async () => await onSubmit()}>
+                        Salvar
+                    </Button>
+                    <Button size="lg" colorScheme="danger" variant="outline" mt="2"
+                        onPress={confirmExit}>
+                        Cancelar
+                    </Button>
                 </VStack>
             </ScrollView>
         </KeyboardAvoidingView>);

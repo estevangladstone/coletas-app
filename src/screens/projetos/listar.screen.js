@@ -61,7 +61,7 @@ const ListarProjetoScreen = (props) => {
                         onEndReachedThreshold={0}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => props.navigation.navigate('EditarProjeto', { 
+                                onPress={() => props.navigation.navigate('VisualizarProjeto', { 
                                     id: item.id,
                                     title: item.nome
                                 })}>

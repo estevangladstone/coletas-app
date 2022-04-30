@@ -18,6 +18,20 @@ export default class FotoService {
         );
     }
 
+    static async updateById(id, uri, assetId, coletaId) {
+        const db = await DatabaseConnection.getConnection();
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    `UPDATE ${table} SET uri = ?, asset_id = ?, coleta_id = ? WHERE id = ?;`,
+                    [uri, assetId, coletaId, id],
+                    (txObj) => resolve(), 
+                    (txObj, error) => console.log('Error ', error)
+                );
+            })
+        );
+    }
+
     static async findByColeta(coletaId) {
         const db = await DatabaseConnection.getConnection();
         return new Promise(
@@ -63,5 +77,19 @@ export default class FotoService {
             })
         );
     }
-    
+
+    static async findThumbnail(coleta_id) {
+        const db = await DatabaseConnection.getConnection();
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT uri FROM ${table} WHERE coleta_id = ? LIMIT 1;`, 
+                    [coleta_id], 
+                    (txObj, { rows }) => resolve(rows._array[0]?.uri),
+                    (txObj, error) => console.log('Error', error)    
+                )
+            })
+        );
+    }
+
 }

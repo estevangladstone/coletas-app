@@ -7,6 +7,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import ColetaService from '../../services/ColetaService';
 import FileService from '../../services/FileService';
 import ConfiguracaoService from '../../services/ConfiguracaoService';
+import ProjetoService from '../../services/ProjetoService';
 
 import TextField from './components/text-field';
 import TextAreaField from './components/textarea-field';
@@ -14,6 +15,7 @@ import DatetimeField from './components/datetime-field';
 
 import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
+import ProjetoSelectField from './components/projeto-select-field';
 
 
 const EditarColetaScreen = (props) => {
@@ -26,6 +28,7 @@ const EditarColetaScreen = (props) => {
     const [currNumeroColeta, setCurrNumeroColeta] = useState(null);
     const [canEdit, setCanEdit] = useState(false);
     const [isReady, setIsReady] = useState(false);
+    const [projetoName, setProjetoName] = useState(null);
 
     useEffect(async () => {
         await FileService.deleteTempFile();
@@ -33,16 +36,26 @@ const EditarColetaScreen = (props) => {
         const numCol = await ConfiguracaoService.findNextNumeroColeta();
         setNextNumeroColeta(numCol);
 
-        ColetaService.findById(props.route.params.id)
+        await ColetaService.findById(props.route.params.id)
         .then((response) => { 
             if(Array.isArray(response._array) && response._array.length > 0) {
                 let col = response._array[0]
+                console.log(response._array[0]);
                 setColeta({
                     ...response._array[0],
                     data_hora: new Date(col.data_hora),
                     numero_coleta: col.numero_coleta ? col.numero_coleta.toString() : '' 
                 });
                 setCurrNumeroColeta(col.numero_coleta);
+             
+                if(col.projeto_id) {
+                    ProjetoService.findById(col.projeto_id)
+                    .then((projetos) => { 
+                        if(projetos._array[0]) {
+                            setProjetoName(projetos._array[0].nome);
+                        }
+                    });
+                }
             }
 
             ColetaService.getPhotosListById(props.route.params.id)
@@ -54,8 +67,10 @@ const EditarColetaScreen = (props) => {
             }).then(
                 () => setIsReady(true)
             );
+
         })
         .catch((error) => {
+            console.log(error);
             Alert.alert(
                 "Erro",
                 "Ocorreu um problema ao tentar abrir a coleta.",
@@ -73,7 +88,7 @@ const EditarColetaScreen = (props) => {
         });
 
         return unsubscribe;
-    }, [props.navigation, isReady]);
+    }, [props.navigation, isReady, photoList]);
 
     const validate = async () => {
         let errorList = {};
@@ -105,8 +120,9 @@ const EditarColetaScreen = (props) => {
         } 
 
         ColetaService.updateById(
-            coleta, photoList 
+            coleta, photoList, projetoName
         ).then(async () => {
+            setIsLoading(false);
             Alert.alert(
                 "Sucesso",
                 "Registro de coleta atualizado com sucesso!",
@@ -116,6 +132,7 @@ const EditarColetaScreen = (props) => {
                 { cancelable: true });
         })
         .catch(() => {
+            setIsLoading(false);
             Alert.alert(
                 "Erro",
                 "Ocorreu um problema ao tentar salvar o registro de Coleta.",
@@ -150,9 +167,10 @@ const EditarColetaScreen = (props) => {
     }
 
     const popPhoto = (photo) => {
-        setPhotoList(photoList.filter((item) => { 
+        let filteredPhotos = photoList.filter((item) => { 
             return item !== photo;
-        }));
+        });
+        setPhotoList(filteredPhotos);
     }
 
     const toggleEdit = () => {
@@ -238,6 +256,12 @@ const EditarColetaScreen = (props) => {
                         value={coleta.outros_coletores}
                         isDisabled={!canEdit}
                         setValue={(value) => setColeta({...coleta, outros_coletores:value})}/>
+
+                    <ProjetoSelectField 
+                        label="Projeto"
+                        value={projetoName}
+                        isDisabled={!canEdit}
+                        setValue={(value) => setProjetoName(value)} />
 
                     <Divider my="2" backgroundColor="#a3a3a3" />
                     <Heading size="md" mb="2">Espécime</Heading>
@@ -330,7 +354,13 @@ const EditarColetaScreen = (props) => {
                     { canEdit ?    
                     <View>
                         <Button 
-                            size="lg" mt="2" colorScheme="green"
+                            isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                            _loading={{
+                                bg: "green",
+                                _text: { color: "white" }
+                            }}
+                            _spinner={{ color: "white" }}
+                            isLoadingText="Salvando"
                             onPress={async () => await onSubmit()}>
                             Salvar
                         </Button>

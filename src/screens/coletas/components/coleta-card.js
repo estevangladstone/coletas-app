@@ -9,6 +9,7 @@ const ColetaCard = ({item}) => {
     return (
         <View
             style={{
+                flex:1,
                 borderBottomWidth: 1,
                 borderColor: '#e5e7eb',
                 padding: '2%',
@@ -41,7 +42,7 @@ const ColetaCard = ({item}) => {
                     />
                 </View>
                 }
-                <VStack>
+                <VStack flex={1}>
                     <Heading isTruncated size="sm" fontSize={18} color="coolGray.800" bold>
                         { item.especie ?? 'Espécie indeterminada' } 
                     </Heading>
@@ -52,7 +53,7 @@ const ColetaCard = ({item}) => {
                         { formatDatetime(item.data_hora) } 
                     </Text>
                 </VStack>
-                <View style={{flex:1}}>
+                <View>
                     <Text px="2" fontSize="xl" color="coolGray.800" alignSelf="flex-end">
                         {item.numero_coleta ? '#'+item.numero_coleta : 'S/N'}
                     </Text>

@@ -3,6 +3,7 @@ import { Alert, KeyboardAvoidingView } from 'react-native';
 import { ScrollView, VStack, Button, Divider, Heading } from 'native-base';
 import TextField from '../coletas/components/text-field';
 import TextAreaField from '../coletas/components/textarea-field';
+import ColetasModal from './components/coletas-modal';
 import ProjetoService from '../../services/ProjetoService';
 import Projeto from '../../models/Projeto';
 
@@ -12,6 +13,7 @@ const CriarProjetoScreen = (props) => {
     const [projeto, setProjeto] = useState(new Projeto);
     const [maxNumCol, setMaxNumCol] = useState(null);
     const [errors, setErrors] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -44,20 +46,20 @@ const CriarProjetoScreen = (props) => {
             if(!insertId) {
                 Alert.alert(
                     "Erro",
-                    "Ocorreu um problema ao tentar salvar o registro de Coleta.",
+                    "Ocorreu um problema ao tentar salvar o Projeto.",
                     [{ text: "OK", style: "default" }] );
             } else {
                 setIsLoading(false);
                 Alert.alert(
                     "Sucesso",
-                    "Registro de coleta criado com sucesso!",
+                    "Projeto criado com sucesso!",
                     [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }]);
             }
         }).catch(() => {
             setIsLoading(false);
             Alert.alert(
                 "Erro",
-                "Ocorreu um problema ao tentar salvar o registro de Coleta.",
+                "Ocorreu um problema ao tentar salvar o Projeto.",
                 [{ text: "OK", style: "default" }] );
         });
     }
@@ -108,8 +110,10 @@ const CriarProjetoScreen = (props) => {
                         Cancelar
                     </Button>
                 </VStack>
+
             </ScrollView>
-        </KeyboardAvoidingView>);
+        </KeyboardAvoidingView>
+    );
 
 }
 

@@ -1,6 +1,7 @@
 import { DatabaseConnection } from '../database/DatabaseConnection';
 import FileService from './FileService';
 import ConfiguracaoService from './ConfiguracaoService';
+import ProjetoService from './ProjetoService';
 import FotoService from './FotoService';
 import * as MediaLibrary from 'expo-media-library';
 
@@ -17,13 +18,14 @@ export default class ColetaService {
                     `INSERT INTO ${table} (data_hora, coletor_principal, outros_coletores,
                     numero_coleta, especie, familia, habito_crescimento, descricao_especime,
                     substrato, descricao_local, latitude, longitude, altitude, pais, estado,
-                    localidade, observacoes) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, 
+                    localidade, observacoes, projeto_id) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, 
                     [model.data_hora, model.coletor_principal, model.outros_coletores,
                     model.numero_coleta, model.especie, model.familia, 
                     model.habito_crescimento, model.descricao_especime, model.substrato,
                     model.descricao_local, model.latitude, model.longitude, model.altitude,
-                    model.pais, model.estado, model.localidade, model.observacoes],
+                    model.pais, model.estado, model.localidade, model.observacoes,
+                    model.projeto_id],
                     async (txObj, { insertId, rows }) => { resolve(insertId) },
                     (txObj, error) => console.log('Error', error)
                 );
@@ -31,7 +33,7 @@ export default class ColetaService {
         );
     }
 
-    static async create(model, photos) {
+    static async create(model, photos, projetoName=null) {
         // transformar nos formatos necessários para o BD
         let parsed_nc = model.numero_coleta ? parseInt(model.numero_coleta) : null;
         let parsed_dh = model.data_hora.toISOString();
@@ -44,22 +46,43 @@ export default class ColetaService {
         });
 
         if(coletaId) {
+            // incluir projeto na coleta
+            if(projetoName) { // se não é nulo
+                // encontrar projeto
+                let projeto = await ProjetoService.findByNome(projetoName);
+                let projetoId = null;
+                if(projeto) {
+                    projetoId = projeto.id;
+                } else {
+                    // se não existe, criar novo
+                    projetoId = await ProjetoService.create({ nome: projetoName });
+                }
+                // associar à coleta
+                await ColetaService.updateProjetoById(projetoId, coletaId);
+            }
+
             if(photos.length) {
                 let newPhotos = await FileService.renamePhotos(model.coletor_principal, parsed_nc, 1);
 
-                let album = await MediaLibrary.getAlbumAsync('fotos_coletas');
+                let album = await MediaLibrary.getAlbumAsync(projetoName ? projetoName : 'Sem projeto');
                 for(let i=0; i<newPhotos.length; i++) {
                     let asset = await MediaLibrary.createAssetAsync(newPhotos[i]);
+                    // obtem timestamp de criação do asset, para referencia
+                    let creationTimestamp = asset.creationTime - 1;
                     if(!album) {
-                        album = await MediaLibrary.createAlbumAsync('fotos_coletas', asset);
+                        // cria o album já movendo o asset para ele
+                        album = await MediaLibrary.createAlbumAsync('fotos_coletas'+ (projetoName ? '/'+projetoName : '/Sem projeto'), asset, false);
                     } else {
-                        await MediaLibrary.addAssetsToAlbumAsync([asset], album);
+                        // move o asset para o album
+                        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
                     }
-                    let movedAsset = await MediaLibrary.getAssetInfoAsync(asset);
+
+                    // obtem a lista de assets do album criados após a timestamp de referencia
+                    let albumPagedInfo = await MediaLibrary.getAssetsAsync({album: album, createdAfter: creationTimestamp});
+                    // obtem asset criado mais recentemente
+                    let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
+                    // cria o registro de foto no banco de dados
                     await FotoService.create(movedAsset.uri, movedAsset.id, coletaId);
-                    if(i == 0) {
-                        await this.updateThumbnailById(movedAsset.uri, coletaId);    
-                    }
                 }
             }
             
@@ -78,18 +101,24 @@ export default class ColetaService {
         }
     }
 
-    static async updateById(model, photos) {
+    static async updateById(model, photos, projetoName=null) {
         // transformar nos formatos necessários para o BD
         let parsed_nc = model.numero_coleta ? parseInt(model.numero_coleta) : null;
         let parsed_dh = model.data_hora.toISOString();
 
+        console.log('menos')
         // salvar no BD
         await this.updateData({
             ...model,
             numero_coleta: parsed_nc,
             data_hora: parsed_dh,
         });
+        console.log('passor')
 
+        // obter projeto atual
+        let currProjeto = model.projeto_id ? await ProjetoService.findById(model.projeto_id) : null; 
+
+        console.log('ese =', currProjeto)
         if(photos.length) {
             let currentPhotos = await this.getPhotosListById(model.id);
 
@@ -103,22 +132,76 @@ export default class ColetaService {
             });
             
             let newPhotos = await FileService.renamePhotos(model.coletor_principal, parsed_nc, currentPhotos.length+1);
-
-            let album = null;
+            let album = await MediaLibrary.getAlbumAsync(currProjeto?._array[0] ? currProjeto._array[0].nome : 'Sem projeto');
             for(let i=0; i<newPhotos.length; i++) {
                 let asset = await MediaLibrary.createAssetAsync(newPhotos[i]);
-                album = album ?? await MediaLibrary.getAlbumAsync('fotos_coletas');
-                await MediaLibrary.addAssetsToAlbumAsync([asset], album);
-                let movedAsset = await MediaLibrary.getAssetInfoAsync(asset);
-                await FotoService.create(movedAsset.uri, movedAsset.id, model.id);
-                if(i == 0) {
-                    await this.updateThumbnailById(movedAsset.uri, model.id);    
+                let creationTimestamp = asset.creationTime - 1;
+                
+                if(!album) {
+                    // cria o album já movendo o asset para ele
+                    album = await MediaLibrary.createAlbumAsync('fotos_coletas'+ (currProjeto?._array[0] ? '/'+currProjeto._array[0].nome : '/Sem projeto'), asset, false);
+                } else {
+                    // move o asset para o album
+                    await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
                 }
+                
+                let albumPagedInfo = await MediaLibrary.getAssetsAsync({album: album, createdAfter: creationTimestamp});
+                let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
+                await FotoService.create(movedAsset.uri, movedAsset.id, model.id);
             }
         }
-        
+        console.log('passou das fotos')
+
         // remove o diretório temp/
         await FileService.deleteTempFile();
+        console.log('limpou temp')
+
+        // comparar projeto.nome com projetoName
+        if(currProjeto?._array[0]?.nome != projetoName) {
+            // buscar o novo projeto ou criar
+            if(projetoName) {
+                let projeto = await ProjetoService.findByNome(projetoName);
+                let projetoId = null;
+
+                if(projeto) {
+                    projetoId = projeto.id;
+                } else {
+                    // se não existe, criar novo
+                    projetoId = await ProjetoService.create({ nome: projetoName });
+                }
+                // associar à coleta
+                await ColetaService.updateProjetoById(projetoId, model.id);
+            } else {
+                await ColetaService.updateProjetoById(null, model.id);
+            }
+            console.log('passou do projeto')
+
+            // obter fotos associadas ao projeto
+            let photosToMove = await this.getPhotosListById(model.id);
+            let album = await MediaLibrary.getAlbumAsync(projetoName);    
+            // para cada foto, mover para a nova pasta
+            for(let i=0; i<photosToMove.length; i++) {
+                let assetToMove = await MediaLibrary.getAssetInfoAsync(photosToMove[i].asset_id);
+                let creationTimestamp = assetToMove.creationTime - 1;
+
+                if(!album) {
+                    album = await MediaLibrary.createAlbumAsync('fotos_coletas'+ (projetoName ? '/'+projetoName : '/Sem projeto'), assetToMove, false);
+                } else {
+                    await MediaLibrary.addAssetsToAlbumAsync([assetToMove], album, false);
+                }
+
+                // obtem a lista de assets do album criados após a timestamp de referencia
+                let albumPagedInfo = await MediaLibrary.getAssetsAsync(
+                    {album: album, createdAfter: creationTimestamp});
+                // obtem asset criado mais recentemente
+                let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
+                // cria o registro de foto no banco de dados
+                await FotoService.updateById(
+                    photosToMove[i].id, movedAsset.uri, movedAsset.id, model.id);
+            }
+            console.log('passou das fotos do projeto')
+        }
+        console.log('passou das etapas do projeto')
 
         // atualizar numero de coleta
         let nextNC = await ConfiguracaoService.findNextNumeroColeta();
@@ -161,13 +244,13 @@ export default class ColetaService {
                     outros_coletores = ?, numero_coleta = ?, especie = ?, familia = ?,
                     habito_crescimento = ?, descricao_especime = ?, substrato = ?,
                     descricao_local = ?, latitude = ?, longitude = ?, altitude = ?,
-                    pais = ?, estado = ?, localidade = ?, observacoes = ?
+                    pais = ?, estado = ?, localidade = ?, observacoes = ?, projeto_id = ?
                     WHERE id = ?;`,
                     [model.data_hora, model.coletor_principal, model.outros_coletores, model.numero_coleta, model.especie,
                     model.familia, model.habito_crescimento, model.descricao_especime, 
                     model.substrato, model.descricao_local, model.latitude, model.longitude,
                     model.altitude, model.pais, model.estado, model.localidade, 
-                    model.observacoes, model.id],
+                    model.observacoes, model.projeto_id, model.id],
                     (txObj) => resolve(),
                     (txObj, error) => { console.log('Error', error); }
                 )
@@ -175,13 +258,13 @@ export default class ColetaService {
         );
     }
 
-    static async updateThumbnailById(thumbnail, id) {
+    static async updateProjetoById(projeto_id, id) {
         const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
-                    `UPDATE ${table} SET thumbnail = ? WHERE id = ?;`,
-                    [thumbnail, id],
+                    `UPDATE ${table} SET projeto_id = ? WHERE id = ?;`,
+                    [projeto_id, id],
                     () => resolve(true),
                     (txObj, error) => { console.log('Error', error); }
                 )
@@ -240,11 +323,44 @@ export default class ColetaService {
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
-                    `SELECT id, data_hora, numero_coleta, especie, localidade, thumbnail 
-                    FROM ${table} ORDER BY id DESC
-                    LIMIT ?, ? ;`,
-                    [offset, limit],
-                    (txObj, { rows }) => { resolve(rows._array) }, 
+                    `SELECT c.id, c.data_hora, c.numero_coleta, c.especie, c.localidade,
+                    f.uri as thumbnail
+                    FROM ${table} c
+                    LEFT JOIN fotos f ON f.id = (
+                        SELECT ft.id
+                        FROM fotos ft
+                        WHERE ft.coleta_id = c.id
+                        LIMIT 1
+                    )  
+                    ORDER BY c.id DESC
+                    LIMIT ? OFFSET ? ;`,
+                    [limit, offset],
+                    (txObj, { rows }) => resolve(rows._array), 
+                    (txObj, error) => { console.log('Error ', error) }
+                );
+            })
+        );   
+    }
+
+    static async fetchMoreByProjeto(projeto_id, limit, offset=0) {
+        const db = await DatabaseConnection.getConnection();
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT c.id, c.data_hora, c.numero_coleta, c.especie, c.localidade,
+                    f.uri as thumbnail
+                    FROM ${table} c
+                    LEFT JOIN fotos f ON f.id = (
+                        SELECT ft.id
+                        FROM fotos ft
+                        WHERE ft.coleta_id = c.id
+                        LIMIT 1
+                    )
+                    WHERE projeto_id = ?
+                    ORDER BY c.id DESC
+                    LIMIT ? OFFSET ? ;`,
+                    [projeto_id, limit, offset],
+                    (txObj, { rows }) => resolve(rows._array), 
                     (txObj, error) => { console.log('Error ', error) }
                 );
             })
@@ -252,7 +368,6 @@ export default class ColetaService {
     }
 
     static async getPhotosListById(id) {
-        const db = await DatabaseConnection.getConnection();
         return new Promise(
             async (resolve, reject) => {
                 const photos = await FotoService.findByColeta(id);
@@ -279,6 +394,28 @@ export default class ColetaService {
                         }
                     }, 
                     (txObj, error) => console.log('Error ', error)
+                );
+            })
+        );
+    }
+
+    static async findByProjetoId(projeto_id) {
+        const db = await DatabaseConnection.getConnection();
+        let query = ''; 
+        let args = []; 
+        if(projeto_id) {
+            query = `SELECT * FROM ${table} WHERE projeto_id = ? ORDER BY id DESC;`;
+            args = [projeto_id];
+        } else {
+            query = `SELECT * FROM ${table} WHERE projeto_id IS NULL ORDER BY id DESC;`;
+        }
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    query,
+                    args,
+                    (txObj, { rows }) => { resolve(rows._array) }, 
+                    (txObj, error) => { console.log('Error ', error) }
                 );
             })
         );

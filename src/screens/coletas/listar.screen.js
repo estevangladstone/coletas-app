@@ -17,31 +17,33 @@ const ListarColetaScreen = (props) => {
     const isFocused = useIsFocused();
 
     useEffect(() => {
-        const unsubscribe = props.navigation.addListener('focus', () => {
-            listar();
+        const unsubscribe = props.navigation.addListener('focus', async () => {
+            await listar();
         });
 
         return unsubscribe;
     }, [props.navigation]);
 
-    const listar = () => {
-        ColetaService.fetchMore(7, 0)
+    const listar = async () => {
+        await ColetaService.fetchMore(7, 0)
             .then(response => {
                 if(response.length == 0) {
                     setHaveMore(false);
                 }
+                console.log('30 = ', response)
                 setColetas(response);
                 setIsLoading(false);
             });
     }
 
-    const fetchMore = () => {
+    const fetchMore = async () => {
         if(!haveMore) { return null }
             
         setIsLoading(true);    
-        ColetaService.fetchMore(5, coletas.length)
+        await ColetaService.fetchMore(5, coletas.length)
             .then(response => {
                 if(response.length == 0) {
+                    console.log('32 = ', response)
                     setHaveMore(false);
                 } else {
                     setColetas([...coletas, ...response]);
@@ -57,7 +59,7 @@ const ListarColetaScreen = (props) => {
                 <Box flex={1}>
                     <FlatList
                         data={coletas}
-                        onEndReached={() => fetchMore()}
+                        onEndReached={async () => await fetchMore()}
                         onEndReachedThreshold={0}
                         renderItem={({item}) => (
                             <TouchableOpacity

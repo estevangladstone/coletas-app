@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, BackHandler, View, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Heading, Button, VStack, HStack, Image, Divider } from 'native-base';
+import { Heading, Button, VStack, HStack, Image, Divider, Select, CheckIcon } from 'native-base';
 
 import Coleta from '../../models/Coleta';
 import ColetaService from '../../services/ColetaService';
@@ -14,6 +14,7 @@ import DatetimeField from './components/datetime-field';
 
 import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
+import ProjetoSelectField from './components/projeto-select-field';
 
 
 const CriarColetaScreen = (props) => {
@@ -23,6 +24,7 @@ const CriarColetaScreen = (props) => {
     const [photoList, setPhotoList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [nextNumeroColeta, setNextNumeroColeta] = useState(null);
+    const [projetoName, setProjetoName] = useState(null);
 
     useEffect(async () => {
         await FileService.deleteTempFile();
@@ -81,7 +83,7 @@ const CriarColetaScreen = (props) => {
         } 
 
         ColetaService.create(
-            coleta, photoList
+            coleta, photoList, projetoName
         ).then((insertId) => {
             if(!insertId) {
                 Alert.alert(
@@ -96,6 +98,7 @@ const CriarColetaScreen = (props) => {
                     [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }]);
             }
         }).catch((erro) => {
+            console.log(erro)
             setIsLoading(false);
             Alert.alert(
                 "Erro",
@@ -165,6 +168,11 @@ const CriarColetaScreen = (props) => {
                         label="Outros coletores"
                         value={coleta.outros_coletores}
                         setValue={(value) => setColeta({...coleta, outros_coletores:value})}/>
+
+                    <ProjetoSelectField 
+                        label="Projeto"
+                        value={projetoName}
+                        setValue={(value) => setProjetoName(value)} />
 
                     <Divider my="2" backgroundColor="#a3a3a3" />
                     <Heading size="md" mb="2">Espécime</Heading>

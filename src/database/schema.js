@@ -1,5 +1,7 @@
 const coletas = [
-    // `DROP TABLE IF EXISTS coletas`,
+    `DELETE FROM coletas`,
+    
+    `DROP TABLE IF EXISTS coletas`,
 
     `CREATE TABLE IF NOT EXISTS coletas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,12 +22,15 @@ const coletas = [
     	estado TEXT,
     	localidade TEXT,
     	observacoes TEXT,
-    	thumbnail TEXT
+        projeto_id INTEGER,
+        foreign key (projeto_id) references projetos (id)
     );`
 ];
 
 const configuracoes = [
-    // `DROP TABLE IF EXISTS configuracoes`,
+    `DELETE FROM configuracoes`,
+    
+    `DROP TABLE IF EXISTS configuracoes`,
 
     `CREATE TABLE IF NOT EXISTS configuracoes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +40,9 @@ const configuracoes = [
 ];
 
 const fotos = [
-    // `DROP TABLE IF EXISTS fotos`,
+    `DELETE FROM fotos`,
+    
+    `DROP TABLE IF EXISTS fotos`,
    
     `CREATE TABLE IF NOT EXISTS fotos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,7 +54,9 @@ const fotos = [
 ];
 
 const projetos = [
-    // `DROP TABLE IF EXISTS projetos`,
+    `DELETE FROM projetos`,
+    
+    `DROP TABLE IF EXISTS projetos`,
     
     `CREATE TABLE IF NOT EXISTS projetos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,16 +65,6 @@ const projetos = [
         created_at TEXT,
         updated_at TEXT
     );`,
-
-    // `DROP TABLE IF EXISTS projeto_coleta`,
-    
-    `CREATE TABLE IF NOT EXISTS projeto_coleta (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        projeto_id INTEGER,
-        coleta_id INTEGER,
-        foreign key (projeto_id) references projetos (id),
-        foreign key (coleta_id) references coletas (id)
-    );`,  
 ];
 
 export const schema = [ ...coletas, ...configuracoes, ...fotos, ...projetos ];

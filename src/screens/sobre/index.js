@@ -1,27 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
-import {DatabaseConnection} from '../../database/DatabaseConnection';
+// import { DatabaseConnection } from '../../database/DatabaseConnection';
+import { DatabaseInit } from '../../database/DatabaseInit';
 
 
 const SobreScreen = (props) => {
 
-    // React.useEffect(async () => {
-    //     const db = await DatabaseConnection.getConnection();
-    //     db.transaction(tx => {
-    //         tx.executeSql(
-    //                 `CREATE TABLE IF NOT EXISTS projetos (
-    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //     nome TEXT,
-    //     descricao TEXT,
-    //     created_at TEXT,
-    //     updated_at TEXT
-    // );`,
-    //             null,
-    //             () => {console.log('ok')},
-    //             (txObj, error) => { console.log('Error', error); }
-    //         )
-    //     });
-    // }, []);
+    const [valor, setValor] = useState(null);
+
+    React.useEffect(async () => {
+        // const db = await DatabaseConnection.getConnection();
+        // db.transaction(tx => {
+        //     tx.executeSql(
+        //             `select thumbnail from coletas;`,
+        //         null,
+        //         (txObj, {rows}) => {console.log('ok');console.log(rows)},
+        //         (txObj, error) => { console.log('Error', error); }
+        //     )
+        // });
+
+        await DatabaseInit();
+    }, []);
 
     return (
         <View style={{flex:1, backgroundColor: '#fafafa'}}>

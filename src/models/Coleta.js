@@ -4,7 +4,7 @@ export default class Coleta {
         numero_coleta=null, especie=null, familia=null, habito_crescimento=null,
         descricao_especime=null, substrato=null, descricao_local=null, latitude=null,
         longitude=null, altitude=null, pais=null, estado=null, localidade=null,
-        observacoes=null, thumbnail=null)
+        observacoes=null, projeto_id=null)
     {
         this.id = id;
         this.data_hora = data_hora;
@@ -24,7 +24,7 @@ export default class Coleta {
         this.estado = estado;
         this.localidade = localidade;
         this.observacoes = observacoes;
-        this.thumbnail = thumbnail;
+        this.projeto_id = projeto_id;
     }
     
 }

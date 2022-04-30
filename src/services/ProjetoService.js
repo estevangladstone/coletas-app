@@ -1,5 +1,4 @@
 import { DatabaseConnection } from '../database/DatabaseConnection';
-import ColetaService from './ColetaService';
 
 
 const table = "projetos"
@@ -77,20 +76,6 @@ export default class ProjetoService {
         );
     }
 
-    // static async updateThumbnailById(thumbnail, id) {
-    //     const db = await DatabaseConnection.getConnection();
-    //     return new Promise(
-    //         (resolve, reject) => db.transaction(tx => {
-    //             tx.executeSql(
-    //                 `UPDATE ${table} SET thumbnail = ? WHERE id = ?;`,
-    //                 [thumbnail, id],
-    //                 () => resolve(true),
-    //                 (txObj, error) => { console.log('Error', error); }
-    //             )
-    //         })
-    //     );
-    // }
-
     static async findById(id) {
         const db = await DatabaseConnection.getConnection();
         return new Promise(
@@ -123,19 +108,19 @@ export default class ProjetoService {
         );
     }
 
-    // static async findAll() {
-    //     const db = await DatabaseConnection.getConnection();
-    //     return new Promise(
-    //         (resolve, reject) => db.transaction(tx => {
-    //             tx.executeSql(
-    //                 `SELECT * FROM ${table} ORDER BY id DESC;`,
-    //                 null,
-    //                 (txObj, { rows }) => { resolve(rows._array) }, 
-    //                 (txObj, error) => { console.log('Error ', error) }
-    //             );
-    //         })
-    //     );
-    // }
+    static async findList() {
+        const db = await DatabaseConnection.getConnection();
+        return new Promise(
+            (resolve, reject) => db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT id, nome FROM ${table} ORDER BY id ASC;`,
+                    null,
+                    (txObj, { rows }) => { resolve(rows._array) }, 
+                    (txObj, error) => { console.log('Error ', error) }
+                );
+            })
+        );
+    }
 
     static async fetchMore(limit, offset=0) {
         const db = await DatabaseConnection.getConnection();
@@ -152,38 +137,5 @@ export default class ProjetoService {
             })
         );   
     }
-
-    // static async getPhotosListById(id) {
-    //     const db = await DatabaseConnection.getConnection();
-    //     return new Promise(
-    //         async (resolve, reject) => {
-    //             const photos = await FotoService.findByColeta(id);
-    //             if(photos && photos.length > 0) {
-    //                 resolve(photos);
-    //             }
-    //             resolve([]);
-    //         }
-    //     );
-    // }
-
-    // static async getMaxNumeroColeta() {
-    //     const db = await DatabaseConnection.getConnection();
-    //     return new Promise(
-    //         (resolve, reject) => db.transaction(tx => {
-    //             tx.executeSql(
-    //                 `SELECT MAX(numero_coleta) AS num FROM ${table};`,
-    //                 null,
-    //                 (txObj, { rows }) => {
-    //                     if(rows.length > 0) {
-    //                         resolve(rows._array[0].num);
-    //                     } else {
-    //                         resolve(0); // se não há coleta, retornar 0 
-    //                     }
-    //                 }, 
-    //                 (txObj, error) => console.log('Error ', error)
-    //             );
-    //         })
-    //     );
-    // }
 
 }
