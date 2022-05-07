@@ -107,7 +107,7 @@ const ListarProjetoScreen = (props) => {
                 <Fab
                     size="lg"
                     borderRadius="full"
-                    colorScheme="green"
+                    bg="green.500" colorScheme="green"
                     placement="bottom-right"
                     icon={
                         <Icon

@@ -118,7 +118,7 @@ const ConfiguracoesScreen = (props) => {
                         errorMessage={"Número inválido ou já existe Coleta com esse número. O próximo número disponível é "+parseInt(maxNumCol+1)}/>
 
                     <Button 
-                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                        isLoading={isLoading} size="lg" mt="2" bg="green.500" colorScheme="green"
                         _loading={{
                             bg: "green",
                             _text: { color: "#fafafa" }

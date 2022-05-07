@@ -63,7 +63,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="leaf" size="sm"/>
                     } 
-                    size="lg" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Criar')}>
                     Criar nova Coleta
                 </Button>
@@ -71,7 +71,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="tag" size="sm"/>
                     }
-                    size="lg" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('CriarProjeto')}>
                     Criar novo Projeto
                 </Button>
@@ -79,7 +79,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="export" size="sm"/>
                     }
-                    size="lg" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Dados')}>
                     Exportar dados
                 </Button>
@@ -87,7 +87,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="cog" size="sm"/>
                     }
-                    size="lg" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Configuracoes')}>
                     Configurações
                 </Button>
@@ -95,7 +95,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="information" size="sm"/>
                     }
-                    size="lg" colorScheme="green" mt={3} mb={4} style={{width:'100%'}}
+                    size="lg" bg="green.500" colorScheme="green" mt={3} mb={4} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Sobre')}>
                     Saiba mais
                 </Button>

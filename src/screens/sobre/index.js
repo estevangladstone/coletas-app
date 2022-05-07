@@ -10,18 +10,22 @@ const SobreScreen = (props) => {
 
     const [valor, setValor] = useState(null);
 
-    React.useEffect(async () => {
-        // const db = await DatabaseConnection.getConnection();
-        // db.transaction(tx => {
-        //     tx.executeSql(
-        //             `select * from fotos;`,
-        //         null,
-        //         (txObj, {rows}) => {console.log('ok');console.log(rows)},
-        //         (txObj, error) => { console.log('Error', error); }
-        //     )
-        // });
+    React.useEffect(() => {
+        async function prepare(){
+            // const db = await DatabaseConnection.getConnection();
+            // db.transaction(tx => {
+            //     tx.executeSql(
+            //             `select * from fotos;`,
+            //         null,
+            //         (txObj, {rows}) => {console.log('ok');console.log(rows)},
+            //         (txObj, error) => { console.log('Error', error); }
+            //     )
+            // });
 
-        // await DatabaseInit();
+            // await DatabaseInit();
+        }
+
+        prepare();
     }, []);
 
     return (
@@ -48,7 +52,7 @@ const SobreScreen = (props) => {
                 </Center>
 
                 <Text fontSize="md" style={{ textAlign: 'justify' }} mb={2}>
-                    <Text bold>Coletas-App</Text> é um aplicativo Android para anotações de coletas botânicas em campo.   
+                    <Text bold>Coletas-App</Text> é um aplicativo móvel para anotações de coletas botânicas em campo.   
                 </Text>
                 <Text fontSize="md" style={{ textAlign: 'justify' }}>
                     Este aplicativo foi desenvolvido como parte do Trabalho de Conclusão de Curso do Bacharelado em Ciência da Computação da UFRJ.

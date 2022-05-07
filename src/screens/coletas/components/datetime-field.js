@@ -55,16 +55,20 @@ const DatetimeField = (props) => {
             <FormControl isInvalid={props.isInvalid} mb="1" isDisabled={props.isDisabled}>
                 <HStack space={2}>
                     <Pressable onPress={() => showDatepicker()} w="49%">
-                        <FormControl.Label _text={{bold: true}} mb="0">Data</FormControl.Label>
+                        <FormControl.Label _text={{bold: true, color:'#404040'}} mb="0">Data</FormControl.Label>
                         <Input
+                            bg='#e5e5e5'
+                            color='black'
                             isReadOnly
                             variant="filled"
                             size="lg"
                             value={maskedDate}/>
                     </Pressable>
                     <Pressable onPress={() => showTimepicker()} w="49%">
-                        <FormControl.Label _text={{bold: true}} mb="0">Hora</FormControl.Label>
+                        <FormControl.Label _text={{bold: true, color:'#404040'}} mb="0">Hora</FormControl.Label>
                         <Input
+                            bg='#e5e5e5'
+                            color='black'
                             isReadOnly
                             variant="filled"
                             size="lg"
@@ -73,7 +77,7 @@ const DatetimeField = (props) => {
                 </HStack>
                 { props.isInvalid &&
                 <FormControl.ErrorMessage 
-                    _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
+                    _text={{fontSize: 'xs', color: '#ee4343', fontWeight: 500}}>
                     {props.errorMessage}
                 </FormControl.ErrorMessage> }
             </FormControl>

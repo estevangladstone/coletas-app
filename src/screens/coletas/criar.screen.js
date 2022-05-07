@@ -26,20 +26,24 @@ const CriarColetaScreen = (props) => {
     const [nextNumeroColeta, setNextNumeroColeta] = useState(null);
     const [projetoName, setProjetoName] = useState(null);
 
-    useEffect(async () => {
-        await FileService.deleteTempFile();
-        
-        const numCol = await ConfiguracaoService.findNextNumeroColeta();
-        const coletor = await ConfiguracaoService.findNomeColetor();
+    useEffect(() => {
+        async function prepare() {
+            await FileService.deleteTempFile();
+            
+            const numCol = await ConfiguracaoService.findNextNumeroColeta();
+            const coletor = await ConfiguracaoService.findNomeColetor();
 
-        setNextNumeroColeta((parseInt(numCol)).toString());
-        setColeta({ 
-            ...coleta, 
-            data_hora: new Date(),
-            numero_coleta: numCol ? (parseInt(numCol)).toString() : '1',
-            coletor_principal: coletor,
-            pais: 'Brasil',
-        });
+            setNextNumeroColeta((parseInt(numCol)).toString());
+            setColeta({ 
+                ...coleta, 
+                data_hora: new Date(),
+                numero_coleta: numCol ? (parseInt(numCol)).toString() : '1',
+                coletor_principal: coletor,
+                pais: 'Brasil',
+            });
+        }
+
+        prepare();
     }, []);
 
     useEffect(() => {
@@ -247,7 +251,7 @@ const CriarColetaScreen = (props) => {
                         setValue={(value) => setColeta({...coleta, observacoes:value})}/>
 
                     <Button 
-                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                        isLoading={isLoading} size="lg" mt="2" bg="green.500" colorScheme="green"
                         _loading={{
                             bg: "green",
                             _text: { color: "white" }

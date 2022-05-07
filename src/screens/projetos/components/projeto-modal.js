@@ -59,7 +59,7 @@ const ProjetoModal = (props) => {
                     <Button 
                         flex={1}
                         size="lg"
-                        colorScheme="green" 
+                        bg="green.500" colorScheme="green" 
                         onPress={onSubmit}>
                         Confirmar
                     </Button>

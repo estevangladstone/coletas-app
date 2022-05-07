@@ -44,6 +44,7 @@ const CameraControls = (props) => {
                 <Icon
                     as={<MaterialCommunityIcons name="camera-plus" />}
                     size="10"
+                    color="#404040"
                 />
             </TouchableOpacity> }
             <FlatList

@@ -61,7 +61,7 @@ const LocationControls = (props) => {
             _loading={{
                 bg: 'green'
             }}
-            colorScheme="green"
+            bg="green.500" colorScheme="green"
             onPress={getLocationData}
             isDisabled={props.isDisabled}>
             { !buttonLoading &&

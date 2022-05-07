@@ -128,7 +128,7 @@ const DadosScreen = (props) => {
                 </View>
 
                 <Button 
-                    isLoading={isLoadingDatabase} size="lg" my="2" colorScheme="green"
+                    isLoading={isLoadingDatabase} size="lg" my="2" bg="green.500" colorScheme="green"
                     _loading={{
                         bg: "green",
                         _text: { color: "white" }

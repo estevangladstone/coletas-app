@@ -69,8 +69,8 @@ const ProjetoSelectField = (props) => {
                         </Picker>
                     </View>
                     <Button 
-                        w="13%" size="lg" ml="2" colorScheme="green" isDisabled={props.isDisabled}
-                        onPress={() => setOpenModal(true)}>
+                        w="13%" size="lg" ml="2" bg="green.500" colorScheme="green" 
+                        isDisabled={props.isDisabled} onPress={() => setOpenModal(true)}>
                         <Icon color="white" size="7" as={<MaterialIcons name="add" />} />
                     </Button>
                 </View>

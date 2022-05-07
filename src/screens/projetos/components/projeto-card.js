@@ -39,7 +39,8 @@ const ProjetoCard = ({item}) => {
                         </Badge>
                         <Icon
                             as={<MaterialCommunityIcons name="tag" />}
-                            size="xl"
+                            size="10"
+                            color="#404040"
                         />
                     </HStack>
                 </View>

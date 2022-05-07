@@ -93,7 +93,7 @@ const CriarProjetoScreen = (props) => {
                         setValue={(value) => setProjeto({...projeto, descricao:value})} />
 
                     <Button 
-                        isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                        isLoading={isLoading} size="lg" mt="2" bg="green.500" colorScheme="green"
                         _loading={{
                             bg: "green",
                             _text: { color: "white" }

@@ -107,7 +107,7 @@ const VisualizarProjetoScreen = (props) => {
                     <HStack style={{justifyContent: 'center'}}>
                         <Button size="lg" mr="1" w="49%" colorScheme="green" 
                             variant="subtle"
-                            rightIcon={<Icon as={MaterialIcons} name="edit" size="sm" />}
+                            rightIcon={<Icon as={MaterialIcons} name="edit" size="md" />}
                             onPress={() => props.navigation.navigate('EditarProjeto', { 
                                 id: projeto.id,
                                 title: projeto.nome
@@ -115,7 +115,7 @@ const VisualizarProjetoScreen = (props) => {
                             Editar
                         </Button>
                         <Button size="lg" ml="1" w="49%" colorScheme="danger" variant="subtle"
-                            rightIcon={<Icon as={MaterialIcons} name="delete" size="sm" />}
+                            rightIcon={<Icon as={MaterialIcons} name="delete" size="md" />}
                             onPress={() => removeProjeto()}>
                             Remover
                         </Button>

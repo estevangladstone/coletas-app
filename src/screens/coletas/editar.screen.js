@@ -30,54 +30,57 @@ const EditarColetaScreen = (props) => {
     const [isReady, setIsReady] = useState(false);
     const [projetoName, setProjetoName] = useState(null);
 
-    useEffect(async () => {
-        await FileService.deleteTempFile();
-        
-        const numCol = await ConfiguracaoService.findNextNumeroColeta();
-        setNextNumeroColeta(numCol);
+    useEffect(() => {
+        async function prepare() {
+            await FileService.deleteTempFile();
+            
+            const numCol = await ConfiguracaoService.findNextNumeroColeta();
+            setNextNumeroColeta(numCol);
 
-        await ColetaService.findById(props.route.params.id)
-        .then((response) => { 
-            if(Array.isArray(response._array) && response._array.length > 0) {
-                let col = response._array[0]
-                console.log(response._array[0]);
-                setColeta({
-                    ...response._array[0],
-                    data_hora: new Date(col.data_hora),
-                    numero_coleta: col.numero_coleta ? col.numero_coleta.toString() : '' 
-                });
-                setCurrNumeroColeta(col.numero_coleta);
-             
-                if(col.projeto_id) {
-                    ProjetoService.findById(col.projeto_id)
-                    .then((projetos) => { 
-                        if(projetos._array[0]) {
-                            setProjetoName(projetos._array[0].nome);
-                        }
+            await ColetaService.findById(props.route.params.id)
+            .then((response) => { 
+                if(Array.isArray(response._array) && response._array.length > 0) {
+                    let col = response._array[0]
+                    console.log(response._array[0]);
+                    setColeta({
+                        ...response._array[0],
+                        data_hora: new Date(col.data_hora),
+                        numero_coleta: col.numero_coleta ? col.numero_coleta.toString() : '' 
                     });
+                    setCurrNumeroColeta(col.numero_coleta);
+                 
+                    if(col.projeto_id) {
+                        ProjetoService.findById(col.projeto_id)
+                        .then((projetos) => { 
+                            if(projetos._array[0]) {
+                                setProjetoName(projetos._array[0].nome);
+                            }
+                        });
+                    }
                 }
-            }
 
-            ColetaService.getPhotosListById(props.route.params.id)
-            .then((photos) => {
-                const photosUris = photos.map((photo) => {
-                    return photo.uri;
-                });
-                setPhotoList(photosUris);
-            }).then(
-                () => setIsReady(true)
-            );
+                ColetaService.getPhotosListById(props.route.params.id)
+                .then((photos) => {
+                    const photosUris = photos.map((photo) => {
+                        return photo.uri;
+                    });
+                    setPhotoList(photosUris);
+                }).then(
+                    () => setIsReady(true)
+                );
 
-        })
-        .catch((error) => {
-            console.log(error);
-            Alert.alert(
-                "Erro",
-                "Ocorreu um problema ao tentar abrir a coleta.",
-                [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
-            );
-        });
+            })
+            .catch((error) => {
+                console.log(error);
+                Alert.alert(
+                    "Erro",
+                    "Ocorreu um problema ao tentar abrir a coleta.",
+                    [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
+                );
+            });
+        }
 
+        prepare();
     }, []);
 
     useEffect(() => {
@@ -212,12 +215,12 @@ const EditarColetaScreen = (props) => {
                     <HStack style={{justifyContent: 'center'}}>
                         <Button size="lg" mr="1" w="49%" colorScheme="green" 
                             variant={canEdit ? "outline" : "subtle"}
-                            rightIcon={<Icon as={MaterialIcons} name={canEdit ? "edit-off" : "edit"} size="sm" />}
+                            rightIcon={<Icon as={MaterialIcons} name={canEdit ? "edit-off" : "edit"} size="md" />}
                             onPress={() => toggleEdit()}>
                             Editar
                         </Button>
                         <Button size="lg" ml="1" w="49%" colorScheme="danger" variant="subtle"
-                            rightIcon={<Icon as={MaterialIcons} name="delete" size="sm" />}
+                            rightIcon={<Icon as={MaterialIcons} name="delete" size="md" />}
                             onPress={() => removeColeta()}>
                             Remover
                         </Button>
@@ -354,7 +357,7 @@ const EditarColetaScreen = (props) => {
                     { canEdit ?    
                     <View>
                         <Button 
-                            isLoading={isLoading} size="lg" mt="2" colorScheme="green"
+                            isLoading={isLoading} size="lg" mt="2" bg="green.500" colorScheme="green"
                             _loading={{
                                 bg: "green",
                                 _text: { color: "white" }

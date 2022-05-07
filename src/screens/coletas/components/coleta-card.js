@@ -43,6 +43,7 @@ const ColetaCard = ({item}) => {
                     <Icon
                         as={<MaterialCommunityIcons name="leaf" />}
                         size="10"
+                        color="#404040"
                     />
                 </View>
                 }
