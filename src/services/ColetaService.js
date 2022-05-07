@@ -106,19 +106,16 @@ export default class ColetaService {
         let parsed_nc = model.numero_coleta ? parseInt(model.numero_coleta) : null;
         let parsed_dh = model.data_hora.toISOString();
 
-        console.log('menos')
         // salvar no BD
         await this.updateData({
             ...model,
             numero_coleta: parsed_nc,
             data_hora: parsed_dh,
         });
-        console.log('passor')
 
         // obter projeto atual
         let currProjeto = model.projeto_id ? await ProjetoService.findById(model.projeto_id) : null; 
 
-        console.log('ese =', currProjeto)
         if(photos.length) {
             let currentPhotos = await this.getPhotosListById(model.id);
 
@@ -150,11 +147,9 @@ export default class ColetaService {
                 await FotoService.create(movedAsset.uri, movedAsset.id, model.id);
             }
         }
-        console.log('passou das fotos')
 
         // remove o diretório temp/
         await FileService.deleteTempFile();
-        console.log('limpou temp')
 
         // comparar projeto.nome com projetoName
         if(currProjeto?._array[0]?.nome != projetoName) {
@@ -174,7 +169,6 @@ export default class ColetaService {
             } else {
                 await ColetaService.updateProjetoById(null, model.id);
             }
-            console.log('passou do projeto')
 
             // obter fotos associadas ao projeto
             let photosToMove = await this.getPhotosListById(model.id);
@@ -199,9 +193,7 @@ export default class ColetaService {
                 await FotoService.updateById(
                     photosToMove[i].id, movedAsset.uri, movedAsset.id, model.id);
             }
-            console.log('passou das fotos do projeto')
         }
-        console.log('passou das etapas do projeto')
 
         // atualizar numero de coleta
         let nextNC = await ConfiguracaoService.findNextNumeroColeta();

@@ -101,8 +101,8 @@ const DadosScreen = (props) => {
     return (
         <ScrollView flex={1} bg="#fafafa">
             <VStack mx="3" my="2">
-                <Heading size="md" mb="1">Exportar Coletas</Heading>
-                <Text my="1" style={{ textAlign:'justify' }}>
+                <Heading size="md" mb="1" style={{ color:'#404040' }}>Exportar Coletas</Heading>
+                <Text my="1" style={{ textAlign:'justify', color:'#525252' }}>
                     Para exportar os registros de coletas em formato CSV, selecione abaixo o conjuto desejado.
                 </Text>
 
@@ -140,8 +140,8 @@ const DadosScreen = (props) => {
                 </Button>
             
                 <Divider my="2" backgroundColor="#a3a3a3" />
-                <Heading size="md" mb="1">Fotos de Coletas</Heading>
-                <Text my="1" style={{ textAlign:'justify' }}>
+                <Heading size="md" mb="1" style={{ color:'#404040' }}>Fotos de Coletas</Heading>
+                <Text my="1" style={{ textAlign:'justify', color:'#525252' }}>
                     Todas as fotografias associadas a registros de coleta são armazenadas no álbum "adCollectio", localizado na galeria do dispositivo.
                 </Text>
             </VStack>

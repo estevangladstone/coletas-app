@@ -35,15 +35,16 @@ const EditarProjetoScreen = (props) => {
     }, []);
 
     const validate = async () => {
-        // validar se já existe o nome
         if(!projeto.nome) {
             setErrors({ nome: 'O campo Nome é obrigatório.' });
             return false;
         } else if(await ProjetoService.findByNome(projeto.nome) && projeto.nome != currNome) {
             setErrors({ nome: 'Já existe Projeto com este nome.' });
             return false;
+        } else if(projeto.nome?.toLowerCase() == 'sem projeto') {
+            setErrors({ nome: 'Este nome não é permitido.' });
+            return false;
         }
-
         return true;
     }
 
@@ -58,9 +59,10 @@ const EditarProjetoScreen = (props) => {
             return false;
         }
 
-        await ProjetoService.updateById(
+        await ProjetoService.update(
             projeto
         ).then(async () => {
+            setIsLoading(false);
             Alert.alert(
                 "Sucesso",
                 "Projeto atualizado com sucesso!",
@@ -70,6 +72,7 @@ const EditarProjetoScreen = (props) => {
                 { cancelable: true });
         })
         .catch(() => {
+            setIsLoading(false);
             Alert.alert(
                 "Erro",
                 "Ocorreu um problema ao tentar salvar o Projeto.",

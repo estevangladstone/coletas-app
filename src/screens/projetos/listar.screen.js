@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { 
     Heading, Button, FlatList, VStack, Fab, Icon, Center, Spinner, Text
 } from 'native-base';
@@ -27,6 +27,7 @@ const ListarProjetoScreen = (props) => {
     const listar = () => {
         ProjetoService.fetchMore(7, 0)
             .then(response => {
+                console.log(response)
                 if(response.length == 0) {
                     setHaveMore(false);
                 }
@@ -51,7 +52,11 @@ const ListarProjetoScreen = (props) => {
     }
 
     return (
-        <View flex={1} bg="#fafafa">
+        <View 
+            style={{
+                flex: 1,
+                backgroundColor: "#fafafa"
+            }}>
             <VStack space={2} flex={1}>
                 { projetos.length > 0 ?
                 <View flex={1}>
@@ -73,10 +78,30 @@ const ListarProjetoScreen = (props) => {
                     />
                 </View> : null }
                 { projetos.length == 0 && !haveMore ? 
-                <Center my="3">
-                    <Text fontSize="md">
-                    Não existem Projetos cadastrados.</Text>
-                </Center> : null }
+                <View style={{
+                        justifyContent: 'center', //Centered horizontally
+                        alignItems: 'center', //Centered vertically
+                        flex:0.7 
+                    }}>
+                    <MaterialCommunityIcons name="tag-multiple" size={100} color="#a3a3a3"/>
+                    <Text
+                        my={3}
+                        px={2}
+                        fontSize="lg" 
+                        style={{
+                            color: "#737373",
+                            textAlign: 'center' 
+                        }}>
+                    Projeto é um conjunto de coletas agrupadas por tema.</Text>
+                    <Text
+                        px={2}
+                        fontSize="lg" 
+                        style={{
+                            color: "#737373",
+                            textAlign: 'center' 
+                        }}>
+                    Ainda não existem projetos cadastrados.</Text>
+                </View> : null }
                 
                 { isFocused ?
                 <Fab
@@ -87,7 +112,7 @@ const ListarProjetoScreen = (props) => {
                     icon={
                         <Icon
                             color="white"
-                            as={<MaterialIcons name="add" />}
+                            as={<MaterialCommunityIcons name="plus" />}
                             size="7"
                         />
                     }

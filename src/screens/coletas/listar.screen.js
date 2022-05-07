@@ -3,7 +3,7 @@ import { TouchableOpacity } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import ColetaService from '../../services/ColetaService';
 import ColetaCard from './components/coleta-card';
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { 
     Box, Heading, Button, FlatList, VStack, Fab, Icon, Text, Center, Spinner
 } from 'native-base';
@@ -75,10 +75,22 @@ const ListarColetaScreen = (props) => {
                     />
                 </Box> : null }
                 { coletas.length == 0 && !haveMore ? 
-                <Center my="3">
-                    <Text fontSize="md">
-                    Não existem registros de Coletas cadastrados.</Text>
-                </Center> : null }
+                <Box style={{
+                        justifyContent: 'center', //Centered horizontally
+                        alignItems: 'center', //Centered vertically
+                        flex:0.7 
+                    }}>
+                    <MaterialCommunityIcons name="leaf" size={100} color="#a3a3a3"/>
+                    <Text
+                        my={3}
+                        px={2}
+                        fontSize="lg" 
+                        style={{
+                            color: "#737373",
+                            textAlign: 'center' 
+                        }}>
+                    Ainda não existem registros de coletas cadastrados.</Text>
+                </Box> : null }
                 
                 { isFocused ?
                 <Fab
@@ -89,7 +101,7 @@ const ListarColetaScreen = (props) => {
                     icon={
                         <Icon
                             color="white"
-                            as={<MaterialIcons name="add" />}
+                            as={<MaterialCommunityIcons name="plus" />}
                             size="7"
                         />
                     }

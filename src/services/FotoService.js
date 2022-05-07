@@ -78,14 +78,17 @@ export default class FotoService {
         );
     }
 
-    static async findThumbnail(coleta_id) {
+    static async findByAsset(assetId) {
         const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
-                    `SELECT uri FROM ${table} WHERE coleta_id = ? LIMIT 1;`, 
-                    [coleta_id], 
-                    (txObj, { rows }) => resolve(rows._array[0]?.uri),
+                    `SELECT * FROM ${table} WHERE asset_id = ?;`, 
+                    [assetId], 
+                    (txObj, { rows }) => { 
+                        console.log('fotos = ', rows);
+                        resolve(rows._array[0]);
+                    },
                     (txObj, error) => console.log('Error', error)    
                 )
             })

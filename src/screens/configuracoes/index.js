@@ -87,6 +87,8 @@ const ConfiguracoesScreen = (props) => {
         await ConfiguracaoService.createOrUpdateByNome(
             'proximo_numero_coleta', parseInt(configuracoes.proximo_numero_coleta));
 
+        await ConfiguracaoService.createOrUpdateByNome('configured_flag', true);
+
         setIsLoading(false);
         Alert.alert(
             "Sucesso",
@@ -119,9 +121,9 @@ const ConfiguracoesScreen = (props) => {
                         isLoading={isLoading} size="lg" mt="2" colorScheme="green"
                         _loading={{
                             bg: "green",
-                            _text: { color: "white" }
+                            _text: { color: "#fafafa" }
                         }}
-                        _spinner={{ color: "white" }}
+                        _spinner={{ color: "#fafafa" }}
                         isLoadingText="Salvando"
                         onPress={onSubmit}>
                         Salvar

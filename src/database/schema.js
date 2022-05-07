@@ -54,7 +54,7 @@ const fotos = [
 ];
 
 const projetos = [
-    `DELETE FROM projetos`,
+    // `DELETE FROM projetos`,
     
     `DROP TABLE IF EXISTS projetos`,
     

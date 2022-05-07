@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, KeyboardAvoidingView, Alert } from 'react-native';
-import { ScrollView } from 'native-base';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { MaterialIcons } from "@expo/vector-icons";
 import { 
-    Heading, Button, FlatList, VStack, HStack, Icon, Center, Spinner, Divider, Text
+    Box, Heading, Button, FlatList, VStack, HStack, Icon, Center, Spinner, Divider, Text
 } from 'native-base';
 import ProjetoService from '../../services/ProjetoService';
 import ColetaService from '../../services/ColetaService';
@@ -95,8 +94,8 @@ const VisualizarProjetoScreen = (props) => {
     }
 
     return (
-        <ScrollView style={{flex:1, backgroundColor:'#fafafa'}} nestedScrollEnabled>
-            <VStack>
+        <Box flex={1} bg="#fafafa">
+            <VStack flex={1}>
                 <View style={{padding:'3%'}}>
                     <Text w="100%" color="coolGray.600" my="2" fontSize={16}>
                         {projeto.descricao ?? 'Sem descrição.'} 
@@ -110,8 +109,8 @@ const VisualizarProjetoScreen = (props) => {
                             variant="subtle"
                             rightIcon={<Icon as={MaterialIcons} name="edit" size="sm" />}
                             onPress={() => props.navigation.navigate('EditarProjeto', { 
-                                id: item.id,
-                                title: item.nome
+                                id: projeto.id,
+                                title: projeto.nome
                             })}>
                             Editar
                         </Button>
@@ -125,7 +124,7 @@ const VisualizarProjetoScreen = (props) => {
                 <Divider my="0" backgroundColor="#e5e7eb" />
 
                 { coletas.length > 0 ?
-                <View style={{ flex:1 }}>
+                <Box flex={1}>
                     <FlatList
                         data={coletas}
                         onEndReached={() => fetchMoreColetas()}
@@ -142,14 +141,14 @@ const VisualizarProjetoScreen = (props) => {
                         keyExtractor={(item, index) => index.toString()}
                         ListFooterComponent={ isLoading ? <Spinner size="lg" p="2" color="green.500" /> : null }
                     />
-                </View> : null }
+                </Box> : null }
                 { coletas.length == 0 && !haveMore ? 
                 <Center my="3">
                     <Text fontSize="md">
                     Não existem Coletas associadas a este Projeto.</Text>
                 </Center> : null }
             </VStack>
-        </ScrollView>
+        </Box>
     );
 }
 

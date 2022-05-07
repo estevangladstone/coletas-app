@@ -38,12 +38,12 @@ const styles = StyleSheet.create({
     },
     input_label: {
         fontWeight: 'bold',
-        color: 'black',
+        color: '#404040',
         paddingTop: 5,
         paddingBottom: 5,
     },
     input_helper: {
-        color: '#727272',
+        color: '#737373',
         paddingBottom: 5,
     },
     input_field: {

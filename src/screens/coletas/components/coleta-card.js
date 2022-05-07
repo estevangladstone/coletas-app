@@ -19,8 +19,10 @@ const ColetaCard = ({item}) => {
                 <Image
                     alt={'thumbnail '+item.id}
                     style={{ 
-                        width:75, 
-                        height:75, 
+                        minWidth: 75,
+                        width: 'auto',
+                        aspectRatio: 1, 
+                        height: '100%', 
                         borderRadius: 5,
                     }}
                     source={{uri:item.thumbnail}}
@@ -28,8 +30,10 @@ const ColetaCard = ({item}) => {
                 :
                 <View 
                     style={{
-                        width: 75, 
-                        height: 75, 
+                        minWidth: 75,
+                        width: 'auto',
+                        aspectRatio: 1, 
+                        height: '100%', 
                         borderRadius: 5,
                         backgroundColor:'#e5e5e5',
                         justifyContent: 'center',

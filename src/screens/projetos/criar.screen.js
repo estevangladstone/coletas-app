@@ -3,7 +3,6 @@ import { Alert, KeyboardAvoidingView } from 'react-native';
 import { ScrollView, VStack, Button, Divider, Heading } from 'native-base';
 import TextField from '../coletas/components/text-field';
 import TextAreaField from '../coletas/components/textarea-field';
-import ColetasModal from './components/coletas-modal';
 import ProjetoService from '../../services/ProjetoService';
 import Projeto from '../../models/Projeto';
 
@@ -11,19 +10,18 @@ import Projeto from '../../models/Projeto';
 const CriarProjetoScreen = (props) => {
 
     const [projeto, setProjeto] = useState(new Projeto);
-    const [maxNumCol, setMaxNumCol] = useState(null);
     const [errors, setErrors] = useState({});
-    const [modalOpen, setModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        // buscar coletas para associar ?
-        // buscar conforme escrever ??
-    }, []);
-
-    const validate = () => {
+    const validate = async () => {
         if(!projeto.nome) {
             setErrors({ nome: 'O campo Nome é obrigatório.' });
+            return false;
+        } else if(await ProjetoService.findByNome(projeto.nome)) {
+            setErrors({ nome: 'Já existe Projeto com este nome.' });
+            return false;
+        } else if(projeto.nome?.toLowerCase() == 'sem projeto') {
+            setErrors({ nome: 'Este nome não é permitido.' });
             return false;
         }
         return true;
@@ -31,7 +29,7 @@ const CriarProjetoScreen = (props) => {
 
     const onSubmit = async () => {
         setIsLoading(true);
-        if(!validate()) {
+        if(!(await validate())) {
             setIsLoading(false);
             Alert.alert(
                 "Aviso",

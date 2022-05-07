@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Project",
-    "slug": "Project",
+    "name": "Coletas-App",
+    "slug": "Coletas-App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/imgs/notebook_icon.png",
+    "icon": "./src/assets/imgs/app_icon.png",
     "splash": {
-      "image": "./src/assets/imgs/notebook_splash.png",
+      "image": "./src/assets/imgs/app_splash.png",
       "resizeMode": "cover",
       "backgroundColor": "#000"
     },
@@ -21,14 +21,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/imgs/notebook_icon.png",
+        "foregroundImage": "./src/assets/imgs/app_icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.estevangnm.Project",
       "permissions": [ "CAMERA", "ACCESS_FINE_LOCATION", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE" ]
     },
     "web": {
-      "favicon": "./src/assets/imgs/notebook_icon.png"
+      "favicon": "./src/assets/imgs/app_icon.png"
     }
   }
 }
