@@ -71,7 +71,7 @@ export default class ColetaService {
                     let creationTimestamp = asset.creationTime - 1;
                     if(!album) {
                         // cria o album já movendo o asset para ele
-                        album = await MediaLibrary.createAlbumAsync('fotos_coletas'+ (projetoName ? '/'+projetoName : '/Sem projeto'), asset, false);
+                        album = await MediaLibrary.createAlbumAsync('Collectfy'+ (projetoName ? '/'+projetoName : '/Sem projeto'), asset, false);
                     } else {
                         // move o asset para o album
                         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
@@ -136,7 +136,7 @@ export default class ColetaService {
                 
                 if(!album) {
                     // cria o album já movendo o asset para ele
-                    album = await MediaLibrary.createAlbumAsync('fotos_coletas'+ (currProjeto?._array[0] ? '/'+currProjeto._array[0].nome : '/Sem projeto'), asset, false);
+                    album = await MediaLibrary.createAlbumAsync('Collectfy'+ (currProjeto?._array[0] ? '/'+currProjeto._array[0].nome : '/Sem projeto'), asset, false);
                 } else {
                     // move o asset para o album
                     await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
@@ -179,7 +179,7 @@ export default class ColetaService {
                 let creationTimestamp = assetToMove.creationTime - 1;
 
                 if(!album) {
-                    album = await MediaLibrary.createAlbumAsync('fotos_coletas'+ (projetoName ? '/'+projetoName : '/Sem projeto'), assetToMove, false);
+                    album = await MediaLibrary.createAlbumAsync('Collectfy'+ (projetoName ? '/'+projetoName : '/Sem projeto'), assetToMove, false);
                 } else {
                     await MediaLibrary.addAssetsToAlbumAsync([assetToMove], album, false);
                 }

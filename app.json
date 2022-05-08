@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Coletas-App",
-    "slug": "Coletas-App",
+    "name": "Collectfy",
+    "slug": "collectfy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/imgs/app_icon.png",

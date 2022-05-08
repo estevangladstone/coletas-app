@@ -93,7 +93,9 @@ const CriarProjetoScreen = (props) => {
                         setValue={(value) => setProjeto({...projeto, descricao:value})} />
 
                     <Button 
-                        isLoading={isLoading} size="lg" mt="2" bg="green.500" colorScheme="green"
+                        isLoading={isLoading} size="md" 
+                        mt="2" bg="green.500" colorScheme="green"
+                        _text={{ fontSize:16 }}
                         _loading={{
                             bg: "green",
                             _text: { color: "white" }
@@ -103,7 +105,9 @@ const CriarProjetoScreen = (props) => {
                         onPress={async () => await onSubmit()}>
                         Salvar
                     </Button>
-                    <Button size="lg" colorScheme="danger" variant="outline" mt="2"
+                    <Button 
+                        size="md" _text={{ fontSize:16 }}
+                        colorScheme="danger" variant="outline" mt="2"
                         onPress={confirmExit}>
                         Cancelar
                     </Button>

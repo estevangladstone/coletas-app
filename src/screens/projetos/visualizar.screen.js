@@ -97,15 +97,23 @@ const VisualizarProjetoScreen = (props) => {
         <Box flex={1} bg="#fafafa">
             <VStack flex={1}>
                 <View style={{padding:'3%'}}>
-                    <Text w="100%" color="coolGray.600" my="2" fontSize={16}>
+                    <Heading size="md" style={{ color:'#404040' }}>
+                        {projeto.nome}
+                    </Heading>
+                    <Text w="100%" color="coolGray.600" my="1" fontSize={16}>
                         {projeto.descricao ?? 'Sem descrição.'} 
                     </Text>
-                    <Text w="100%" color="coolGray.600" my="2" fontSize={14}>
+                    <Text w="100%" color="coolGray.600" my="1" fontSize={16}>
+                        {coletas.length + (coletas.length == 1 ? ' coleta associada' : ' coletas associadas')} 
+                    </Text>
+                    <Text w="100%" color="coolGray.600" mt="1" mb="3" bold fontSize={14}>
                         Atualizado em { formatDatetime(projeto.updated_at) } 
                     </Text>
 
                     <HStack style={{justifyContent: 'center'}}>
-                        <Button size="lg" mr="1" w="49%" colorScheme="green" 
+                        <Button 
+                            size="md" _text={{ fontSize:16 }} 
+                            mr="1" w="49%" colorScheme="green" 
                             variant="subtle"
                             rightIcon={<Icon as={MaterialIcons} name="edit" size="md" />}
                             onPress={() => props.navigation.navigate('EditarProjeto', { 
@@ -114,7 +122,9 @@ const VisualizarProjetoScreen = (props) => {
                             })}>
                             Editar
                         </Button>
-                        <Button size="lg" ml="1" w="49%" colorScheme="danger" variant="subtle"
+                        <Button 
+                            size="md" _text={{ fontSize:16 }} 
+                            ml="1" w="49%" colorScheme="danger" variant="subtle"
                             rightIcon={<Icon as={MaterialIcons} name="delete" size="md" />}
                             onPress={() => removeProjeto()}>
                             Remover
@@ -144,7 +154,7 @@ const VisualizarProjetoScreen = (props) => {
                 </Box> : null }
                 { coletas.length == 0 && !haveMore ? 
                 <Center my="3">
-                    <Text fontSize="md">
+                    <Text fontSize="md" color="#737373">
                     Não existem Coletas associadas a este Projeto.</Text>
                 </Center> : null }
             </VStack>

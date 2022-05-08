@@ -128,7 +128,9 @@ const DadosScreen = (props) => {
                 </View>
 
                 <Button 
-                    isLoading={isLoadingDatabase} size="lg" my="2" bg="green.500" colorScheme="green"
+                    isLoading={isLoadingDatabase} size="md" 
+                    my="2" bg="green.500" colorScheme="green"
+                    _text={{ fontSize:16 }}
                     _loading={{
                         bg: "green",
                         _text: { color: "white" }
@@ -143,7 +145,7 @@ const DadosScreen = (props) => {
                 <Heading size="md" mb="1" style={{ color:'#404040' }}>Fotos de Coletas</Heading>
                 <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
                     Todas as fotografias associadas a registros de coleta são armazenadas na 
-                    pasta <Text italic>"Coletas-App"</Text>, em pastas com o nome do Projeto correspondente. 
+                    pasta <Text italic>"Collectfy"</Text>, em pastas com o nome do Projeto correspondente. 
                     Também estão armazenadas em álbuns de mesmo nome, na galeria do dispositivo.
                 </Text>
                 <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>

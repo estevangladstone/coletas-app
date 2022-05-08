@@ -26,7 +26,7 @@ const HomeScreen = (props) => {
         <SafeAreaView style={{flex:1}}>
             <ScrollView px={5} bg="#fafafa">
                 <Text fontSize="lg" mt={2} style={{ textAlign: 'center', color: '#404040' }}>
-                    <Text bold italic>Coletas-App</Text> é um aplicativo para anotações de coletas botânicas em campo. 
+                    <Text bold italic>Collectfy</Text> é um aplicativo para anotações de coletas botânicas em campo. 
                 </Text>
 
                 <Center>
@@ -63,8 +63,8 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="leaf" size="md"/>
                     } 
-                    size="lg" bg="green.500" colorScheme="green" 
-                    mt={3} style={{width:'100%'}}
+                    size="md" bg="green.500" colorScheme="green" 
+                    mt={3} _text={{ fontSize:16 }} style={{ width:'100%' }}
                     onPress={() => props.navigation.navigate('Criar')}>
                     Criar nova Coleta
                 </Button>
@@ -72,7 +72,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="tag" size="md"/>
                     }
-                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="md" bg="green.500" colorScheme="green" mt={3} _text={{ fontSize:16 }} style={{ width:'100%' }}
                     onPress={() => props.navigation.navigate('CriarProjeto')}>
                     Criar novo Projeto
                 </Button>
@@ -80,7 +80,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="export" size="md"/>
                     }
-                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="md" bg="green.500" colorScheme="green" mt={3} _text={{ fontSize:16 }} style={{ width:'100%' }}
                     onPress={() => props.navigation.navigate('Dados')}>
                     Exportar dados
                 </Button>
@@ -88,7 +88,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="cog" size="md"/>
                     }
-                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="md" bg="green.500" colorScheme="green" mt={3} _text={{ fontSize:16 }} style={{ width:'100%' }}
                     onPress={() => props.navigation.navigate('Configuracoes')}>
                     Configurações
                 </Button>
@@ -96,7 +96,7 @@ const HomeScreen = (props) => {
                     leftIcon={
                         <Icon as={MaterialCommunityIcons} name="information" size="md"/>
                     }
-                    size="lg" bg="green.500" colorScheme="green" mt={3} mb={4} style={{width:'100%'}}
+                    size="md" bg="green.500" colorScheme="green" mt={3} mb={4} _text={{ fontSize:16 }} style={{ width:'100%' }}
                     onPress={() => props.navigation.navigate('Sobre')}>
                     Saiba mais
                 </Button>

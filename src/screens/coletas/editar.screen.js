@@ -161,7 +161,8 @@ const EditarColetaScreen = (props) => {
 
     const updatePhotosList = async () => {
         let photos = await FileService.getTempContents();
-        setPhotoList([...photoList, ...photos]);
+        let photosToAdd = photos.filter((item) => photoList.indexOf(item) < 0);
+        setPhotoList([...photoList, ...photosToAdd]);
     }
 
     const closeCamera = () => {
@@ -213,13 +214,13 @@ const EditarColetaScreen = (props) => {
             <ScrollView style={{flex: 1, backgroundColor:'#fafafa'}}>
                 <VStack mx="3" my="2">
                     <HStack style={{justifyContent: 'center'}}>
-                        <Button size="lg" mr="1" w="49%" colorScheme="green" 
+                        <Button size="md" _text={{ fontSize:16 }} mr="1" w="49%" colorScheme="green" 
                             variant={canEdit ? "outline" : "subtle"}
                             rightIcon={<Icon as={MaterialIcons} name={canEdit ? "edit-off" : "edit"} size="md" />}
                             onPress={() => toggleEdit()}>
                             Editar
                         </Button>
-                        <Button size="lg" ml="1" w="49%" colorScheme="danger" variant="subtle"
+                        <Button size="md" _text={{ fontSize:16 }} ml="1" w="49%" colorScheme="danger" variant="subtle"
                             rightIcon={<Icon as={MaterialIcons} name="delete" size="md" />}
                             onPress={() => removeColeta()}>
                             Remover
@@ -357,7 +358,7 @@ const EditarColetaScreen = (props) => {
                     { canEdit ?    
                     <View>
                         <Button 
-                            isLoading={isLoading} size="lg" mt="2" bg="green.500" colorScheme="green"
+                            isLoading={isLoading} size="md" _text={{ fontSize:16 }} mt="2" bg="green.500" colorScheme="green"
                             _loading={{
                                 bg: "green",
                                 _text: { color: "white" }
@@ -367,7 +368,7 @@ const EditarColetaScreen = (props) => {
                             onPress={async () => await onSubmit()}>
                             Salvar
                         </Button>
-                        <Button size="lg" colorScheme="danger" variant="outline" mt="2"
+                        <Button size="md" _text={{ fontSize:16 }} colorScheme="danger" variant="outline" mt="2"
                             onPress={confirmExit}>
                             Cancelar
                         </Button>

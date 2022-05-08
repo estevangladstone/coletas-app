@@ -36,7 +36,8 @@ const PhotoModal = (props) => {
 				<Modal.Footer style={{backgroundColor: 'transparent'}}>
 					<Button 
 						flex={1}
-					    size="lg"
+					    size="md"
+					    _text={{ fontSize:16 }}
 					    variant="subtle" 
 					    colorScheme="muted" 
 					    onPress={() => props.closeModal()}>
@@ -45,7 +46,8 @@ const PhotoModal = (props) => {
 					{ !props.isDisabled ? 
 					<Button 
 						flex={1}
-						size="lg"
+						size="md"
+						_text={{ fontSize:16 }}
 						colorScheme="danger" 
 						onPress={() => {
 							Alert.alert(

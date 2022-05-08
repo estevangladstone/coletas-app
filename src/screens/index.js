@@ -89,8 +89,7 @@ const NavigationStack = () => {
 	            options={(props) => { 
 	            	return {
 	    				headerShadowVisible: false, 
-		            	title:'Coletas-App',  
-			    	    // headerLeft: () => <MenuOptions {...props}/>,
+		            	title:'Collectfy',  
 			    	}
 	            }} />
 	        <Stack.Screen 
@@ -114,15 +113,11 @@ const NavigationStack = () => {
 	        <Stack.Screen 
 	            name="EditarProjeto" 
 	            component={ EditarProjetoScreen }
-	            options={(props) => {
-	            	return {title:props.route.params.title}; 
-	         	}} />
+	            options={{ title:'Editar Projeto' }} />
 	        <Stack.Screen 
 	            name="VisualizarProjeto" 
 	            component={ VisualizarProjetoScreen }
-	            options={(props) => {
-	            	return {title:props.route.params.title}; 
-	         	}} />
+	            options={{ title:'Projeto' }} />
 	        <Stack.Screen 
 	            name="Dados" 
 	            component={ DadosScreen }

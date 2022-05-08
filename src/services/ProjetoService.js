@@ -72,7 +72,7 @@ export default class ProjetoService {
                     }
 
                     if(!newAlbum) {
-                        newAlbum = await MediaLibrary.createAlbumAsync('fotos_coletas/'+toName, oldAlbumPagedInfo.assets[i], false);
+                        newAlbum = await MediaLibrary.createAlbumAsync('Collectfy/'+toName, oldAlbumPagedInfo.assets[i], false);
                     } else {
                         await MediaLibrary.addAssetsToAlbumAsync([oldAlbumPagedInfo.assets[i]], newAlbum, false);
                     }
