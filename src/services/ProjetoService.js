@@ -39,7 +39,6 @@ export default class ProjetoService {
     }
 
     static async update(model) {
-        // salvar no BD
         let now = (new Date).toISOString();
         let raw_projetos = await this.findById(model.id);
         let currProjeto = raw_projetos._array[0];
@@ -50,67 +49,55 @@ export default class ProjetoService {
         });
 
         if(model.nome != currProjeto.nome) {
-            let oldAlbum = await MediaLibrary.getAlbumAsync(currProjeto.nome);
-            // console.log('oldAlbum = ', oldAlbum);
-            if(oldAlbum) {
-                // console.log('chegou')
-                let oldAlbumPagedInfo = await MediaLibrary.getAssetsAsync({ album: oldAlbum });
-                let newAlbum = await MediaLibrary.getAlbumAsync(model.nome);
-                let recentTimestamp = null;
+            await this.moveAlbum(currProjeto.nome, model.nome);
+        }
+    }
 
-                // console.log('album antigo = ', oldAlbumPagedInfo);
+    static async moveAlbum(fromName, toName) {
+        console.log('comeco')
+        let oldAlbum = await MediaLibrary.getAlbumAsync(fromName);
+        if(oldAlbum) {
+            let oldAlbumPagedInfo = await MediaLibrary.getAssetsAsync({ album: oldAlbum });
+            let newAlbum = await MediaLibrary.getAlbumAsync(toName);
+            let recentTimestamp = null;
+            console.log('ei')
 
-                let hasAssets = oldAlbumPagedInfo.assets.length > 0 ? true : false;
-                while(hasAssets) {
-                    // console.log('entrou no loop')
+            let hasAssets = oldAlbumPagedInfo.assets.length > 0 ? true : false;
+            while(hasAssets) {
+                for(let i=0; i<oldAlbumPagedInfo.assets.length; i++) {
+                    let oldFoto = await FotoService.findByAsset(oldAlbumPagedInfo.assets[i].id);
 
-                    for(let i=0; i<oldAlbumPagedInfo.assets.length; i++) {
-                        // console.log('loop ', i);
-                        // console.log('o asset_id = ', oldAlbumPagedInfo);
-                        let oldFoto = await FotoService.findByAsset(oldAlbumPagedInfo.assets[i].id);
-                        // console.log('foto antiga = ', oldFoto);
-
-                        if(!recentTimestamp) {
-                            recentTimestamp = oldAlbumPagedInfo.assets[i].creationTime - 1;
-                        }
-
-                        if(!newAlbum) {
-                            newAlbum = await MediaLibrary.createAlbumAsync('fotos_coletas/'+model.nome, oldAlbumPagedInfo.assets[i], false);
-                        } else {
-                            await MediaLibrary.addAssetsToAlbumAsync([oldAlbumPagedInfo.assets[i]], newAlbum, false);
-                        }
-                        // console.log('moveu o asset!');
-
-                        let newAlbumPagedInfo = await MediaLibrary.getAssetsAsync(
-                            {album: newAlbum, createdAfter: recentTimestamp});
-                        // console.log('pegou novo album')
-                        let movedAsset = newAlbumPagedInfo.assets[newAlbumPagedInfo.assets.length - 1];
-                        // console.log('ewd = ', movedAsset);
-                        recentTimestamp = movedAsset.creationTime - 1;
-                        // console.log('nova timestamp = ', recentTimestamp);
-
-                        await FotoService.updateById(
-                            oldFoto.id, movedAsset.uri, movedAsset.id, oldFoto.coleta_id);
-                        // console.log('atualizou foto : ', movedAsset.uri);
-
-                        // let f = await FotoService.findByAsset(movedAsset.id);
-                        // console.log('a foto = ', f)
+                    if(!recentTimestamp) {
+                        recentTimestamp = oldAlbumPagedInfo.assets[i].creationTime - 1;
                     }
 
-                    // console.log('tem proxima pagina? ', oldAlbumPagedInfo.hasNextPage);
-                    if(oldAlbumPagedInfo.hasNextPage) {
-                        oldAlbumPagedInfo = await MediaLibrary.getAssetsAsync({ album: oldAlbum });
-                        // console.log('proxima pagina = ', oldAlbumPagedInfo);
-                        hasAssets = true;
+                    if(!newAlbum) {
+                        newAlbum = await MediaLibrary.createAlbumAsync('fotos_coletas/'+toName, oldAlbumPagedInfo.assets[i], false);
                     } else {
-                        hasAssets = false;
+                        await MediaLibrary.addAssetsToAlbumAsync([oldAlbumPagedInfo.assets[i]], newAlbum, false);
                     }
+
+                    let newAlbumPagedInfo = await MediaLibrary.getAssetsAsync(
+                        {album: newAlbum, createdAfter: recentTimestamp});
+                    let movedAsset = newAlbumPagedInfo.assets[newAlbumPagedInfo.assets.length - 1];
+                    recentTimestamp = movedAsset.creationTime - 1;
+
+                    await FotoService.updateById(
+                        oldFoto.id, movedAsset.uri, movedAsset.id, oldFoto.coleta_id);
                 }
 
-                // remover album vazio
-                // console.log('saindo')
+                if(oldAlbumPagedInfo.hasNextPage) {
+                    oldAlbumPagedInfo = await MediaLibrary.getAssetsAsync({ album: oldAlbum });
+                    hasAssets = true;
+                } else {
+                    hasAssets = false;
+                }
             }
+
+            await MediaLibrary.deleteAlbumsAsync([oldAlbum.id]);
+            console.log('lold')
         }
+        console.log('aqui')
     }
 
     static async updateData(model) {
@@ -128,7 +115,7 @@ export default class ProjetoService {
         );
     }
 
-    static async deleteById(id) {
+    static async delete(id) {
         const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
@@ -145,6 +132,17 @@ export default class ProjetoService {
                 )
             })
         );
+    }
+
+    static async deleteById(id) {
+        let raw_projetos = await this.findById(id);
+        let currProjeto = raw_projetos._array[0];
+
+        console.log('1')
+        await this.moveAlbum(currProjeto.nome, 'Sem projeto');
+        console.log('2')
+        return await this.delete(id);
+        console.log('3')
     }
 
     static async findById(id) {

@@ -1,5 +1,5 @@
 const coletas = [
-    `DELETE FROM coletas`,
+    // `DELETE FROM coletas`,
     
     `DROP TABLE IF EXISTS coletas`,
 
@@ -28,7 +28,7 @@ const coletas = [
 ];
 
 const configuracoes = [
-    `DELETE FROM configuracoes`,
+    // `DELETE FROM configuracoes`,
     
     `DROP TABLE IF EXISTS configuracoes`,
 
@@ -40,7 +40,7 @@ const configuracoes = [
 ];
 
 const fotos = [
-    `DELETE FROM fotos`,
+    // `DELETE FROM fotos`,
     
     `DROP TABLE IF EXISTS fotos`,
    

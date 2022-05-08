@@ -8,7 +8,7 @@
     "splash": {
       "image": "./src/assets/imgs/app_splash.png",
       "resizeMode": "cover",
-      "backgroundColor": "#000"
+      "backgroundColor": "#fafafa"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -20,9 +20,10 @@
       "supportsTablet": true
     },
     "android": {
+      "icon": "./src/assets/imgs/app_icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/imgs/app_icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#fafafa"
       },
       "package": "com.estevangnm.Project",
       "permissions": [ "CAMERA", "ACCESS_FINE_LOCATION", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE" ]

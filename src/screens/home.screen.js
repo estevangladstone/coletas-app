@@ -29,7 +29,7 @@ const HomeScreen = (props) => {
                     <Text bold italic>Coletas-App</Text> é um aplicativo para anotações de coletas botânicas em campo. 
                 </Text>
 
-                <Center m={2}>
+                <Center>
                     <Image 
                         alt="app logo"
                         style={{ 
@@ -61,15 +61,16 @@ const HomeScreen = (props) => {
 
                 <Button
                     leftIcon={
-                        <Icon as={MaterialCommunityIcons} name="leaf" size="sm"/>
+                        <Icon as={MaterialCommunityIcons} name="leaf" size="md"/>
                     } 
-                    size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
+                    size="lg" bg="green.500" colorScheme="green" 
+                    mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Criar')}>
                     Criar nova Coleta
                 </Button>
                 <Button 
                     leftIcon={
-                        <Icon as={MaterialCommunityIcons} name="tag" size="sm"/>
+                        <Icon as={MaterialCommunityIcons} name="tag" size="md"/>
                     }
                     size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('CriarProjeto')}>
@@ -77,7 +78,7 @@ const HomeScreen = (props) => {
                 </Button>
                 <Button 
                     leftIcon={
-                        <Icon as={MaterialCommunityIcons} name="export" size="sm"/>
+                        <Icon as={MaterialCommunityIcons} name="export" size="md"/>
                     }
                     size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Dados')}>
@@ -85,7 +86,7 @@ const HomeScreen = (props) => {
                 </Button>
                 <Button 
                     leftIcon={
-                        <Icon as={MaterialCommunityIcons} name="cog" size="sm"/>
+                        <Icon as={MaterialCommunityIcons} name="cog" size="md"/>
                     }
                     size="lg" bg="green.500" colorScheme="green" mt={3} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Configuracoes')}>
@@ -93,7 +94,7 @@ const HomeScreen = (props) => {
                 </Button>
                 <Button 
                     leftIcon={
-                        <Icon as={MaterialCommunityIcons} name="information" size="sm"/>
+                        <Icon as={MaterialCommunityIcons} name="information" size="md"/>
                     }
                     size="lg" bg="green.500" colorScheme="green" mt={3} mb={4} style={{width:'100%'}}
                     onPress={() => props.navigation.navigate('Sobre')}>

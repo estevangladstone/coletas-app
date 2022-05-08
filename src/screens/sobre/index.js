@@ -4,6 +4,7 @@ import { ScrollView, Link, Center, Heading, Text } from 'native-base';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { DatabaseConnection } from '../../database/DatabaseConnection';
 import { DatabaseInit } from '../../database/DatabaseInit';
+import * as MediaLibrary from 'expo-media-library';
 
 
 const SobreScreen = (props) => {
@@ -22,7 +23,7 @@ const SobreScreen = (props) => {
             //     )
             // });
 
-            // await DatabaseInit();
+            await DatabaseInit();
         }
 
         prepare();

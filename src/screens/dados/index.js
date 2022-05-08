@@ -102,8 +102,8 @@ const DadosScreen = (props) => {
         <ScrollView flex={1} bg="#fafafa">
             <VStack mx="3" my="2">
                 <Heading size="md" mb="1" style={{ color:'#404040' }}>Exportar Coletas</Heading>
-                <Text my="1" style={{ textAlign:'justify', color:'#525252' }}>
-                    Para exportar os registros de coletas em formato CSV, selecione abaixo o conjuto desejado.
+                <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
+                    Selecione abaixo o conjuto desejado para exportar os registros de coletas em formato CSV.
                 </Text>
 
                 <View style={{borderRadius:4, overflow:'hidden', padding:0}}>
@@ -141,9 +141,14 @@ const DadosScreen = (props) => {
             
                 <Divider my="2" backgroundColor="#a3a3a3" />
                 <Heading size="md" mb="1" style={{ color:'#404040' }}>Fotos de Coletas</Heading>
-                <Text my="1" style={{ textAlign:'justify', color:'#525252' }}>
-                    Todas as fotografias associadas a registros de coleta são armazenadas no álbum "adCollectio", localizado na galeria do dispositivo.
+                <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
+                    Todas as fotografias associadas a registros de coleta são armazenadas na 
+                    pasta <Text italic>"Coletas-App"</Text>, em pastas com o nome do Projeto correspondente. 
+                    Também estão armazenadas em álbuns de mesmo nome, na galeria do dispositivo.
                 </Text>
+                <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
+                    As coletas sem projeto associado, estão na pasta e álbum de nome "Sem projeto".
+                </Text> 
             </VStack>
         </ScrollView>
     );
