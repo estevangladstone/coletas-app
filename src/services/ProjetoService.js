@@ -4,11 +4,12 @@ import * as MediaLibrary from 'expo-media-library';
 
 
 const table = "projetos"
+const db = DatabaseConnection.getConnection();
 
 export default class ProjetoService {
 
     static async addData(model) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -101,7 +102,7 @@ export default class ProjetoService {
     }
 
     static async updateData(model) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -116,7 +117,7 @@ export default class ProjetoService {
     }
 
     static async delete(id) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -146,7 +147,7 @@ export default class ProjetoService {
     }
 
     static async findById(id) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -160,7 +161,7 @@ export default class ProjetoService {
     }
 
     static async findByNome(nome) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -178,7 +179,7 @@ export default class ProjetoService {
     }
 
     static async findList() {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -192,7 +193,7 @@ export default class ProjetoService {
     }
 
     static async fetchMore(limit, offset=0) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(

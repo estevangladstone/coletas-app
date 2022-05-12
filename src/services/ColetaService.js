@@ -7,11 +7,12 @@ import * as MediaLibrary from 'expo-media-library';
 
 
 const table = "coletas"
+const db = DatabaseConnection.getConnection();
 
 export default class ColetaService {
 
     static async addData(model) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -213,7 +214,7 @@ export default class ColetaService {
             await FotoService.deleteByColeta(id);
         }
 
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -228,7 +229,7 @@ export default class ColetaService {
 
     // TODO: Permitir alterar por valores escolhidos
     static async updateData(model) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -251,7 +252,7 @@ export default class ColetaService {
     }
 
     static async updateProjetoById(projeto_id, id) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -265,7 +266,7 @@ export default class ColetaService {
     }
 
     static async findById(id) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -279,7 +280,7 @@ export default class ColetaService {
     }
 
     static async findByNumeroColeta(numero_coleta) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -297,7 +298,7 @@ export default class ColetaService {
     }
 
     static async findAll() {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -311,7 +312,7 @@ export default class ColetaService {
     }
 
     static async fetchMore(limit, offset=0) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -335,7 +336,7 @@ export default class ColetaService {
     }
 
     static async fetchMoreByProjeto(projeto_id, limit, offset=0) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -372,7 +373,7 @@ export default class ColetaService {
     }
 
     static async getMaxNumeroColeta() {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -392,7 +393,7 @@ export default class ColetaService {
     }
 
     static async findByProjetoId(projeto_id) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         let query = ''; 
         let args = []; 
         if(projeto_id) {

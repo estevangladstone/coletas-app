@@ -8,6 +8,8 @@ import { DatabaseConnection } from '../../database/DatabaseConnection';
 // import * as FileSystem from 'expo-file-system';
 
 
+const db = DatabaseConnection.getConnection();
+
 const SobreScreen = (props) => {
 
     const [valor, setValor] = useState(null);
@@ -23,7 +25,6 @@ const SobreScreen = (props) => {
         async function prepare(){
             // let t = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory+'/SQLite')
             // console.log('t = ', t);
-            const db = await DatabaseConnection.getConnection();
             db.transaction(tx => {
                 tx.executeSql(
                     `SELECT * FROM coletas;`,

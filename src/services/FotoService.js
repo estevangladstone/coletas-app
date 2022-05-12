@@ -1,11 +1,12 @@
 import { DatabaseConnection } from '../database/DatabaseConnection';
 
 const table = "fotos";
+const db = DatabaseConnection.getConnection();
 
 export default class FotoService {
 
     static async create(uri, assetId, coletaId) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -19,7 +20,7 @@ export default class FotoService {
     }
 
     static async updateById(id, uri, assetId, coletaId) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -33,7 +34,7 @@ export default class FotoService {
     }
 
     static async findByColeta(coletaId) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -51,7 +52,7 @@ export default class FotoService {
     }
 
     static async deleteByColeta(coletaId) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -65,7 +66,7 @@ export default class FotoService {
     }
 
     static async deleteByAsset(assetId) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -79,7 +80,7 @@ export default class FotoService {
     }
 
     static async findByAsset(assetId) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(

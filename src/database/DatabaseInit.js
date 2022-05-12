@@ -2,10 +2,10 @@ import { DatabaseConnection } from './DatabaseConnection';
 import { schema } from './schema';
 
 
-export const DatabaseInit = async () => {
+export const DatabaseInit = () => {
 
     var db = null
-    db = await DatabaseConnection.getConnection();
+    db = DatabaseConnection.getConnection();
     db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () => {
         console.log('Foreign keys turned on');
     });

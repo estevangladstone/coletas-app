@@ -2,11 +2,12 @@ import { DatabaseConnection } from '../database/DatabaseConnection';
 
 
 const table = "configuracoes";
+const db = DatabaseConnection.getConnection();
 
 export default class ConfiguracaoService {
 
 	static async findAll() {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
 	    return new Promise(
 	        (resolve, reject) => db.transaction(tx => {
 	            tx.executeSql(
@@ -29,7 +30,7 @@ export default class ConfiguracaoService {
     }
 
     static async create(nome, valor) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -43,7 +44,7 @@ export default class ConfiguracaoService {
     }
     
     static async updateByNome(nome, valor) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -57,7 +58,7 @@ export default class ConfiguracaoService {
     }
 
     static async findByNome(nome) {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -75,7 +76,7 @@ export default class ConfiguracaoService {
     }
 
     static async findNextNumeroColeta() {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
@@ -99,7 +100,7 @@ export default class ConfiguracaoService {
         if(!exists) {
             await this.create('proximo_numero_coleta', valor);
         } else {
-            const db = await DatabaseConnection.getConnection();
+            // const db = await DatabaseConnection.getConnection();
             return new Promise(
                 (resolve, reject) => db.transaction(tx => {
                     tx.executeSql(
@@ -114,7 +115,7 @@ export default class ConfiguracaoService {
     }
 
     static async findNomeColetor() {
-        const db = await DatabaseConnection.getConnection();
+        // const db = await DatabaseConnection.getConnection();
         return new Promise(
             (resolve, reject) => db.transaction(tx => {
                 tx.executeSql(
