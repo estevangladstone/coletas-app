@@ -7,7 +7,7 @@ import ColetaService from '../../services/ColetaService';
 import ProjetoService from '../../services/ProjetoService';
 import { jsonToCSV } from 'react-native-csv';
 import * as Sharing from 'expo-sharing';
-import { formatColetaData } from '../../helpers';
+import { formatColetaData, formatDate, slugify } from '../../helpers';
 
 
 const DadosScreen = (props) => {
@@ -20,8 +20,7 @@ const DadosScreen = (props) => {
         ProjetoService.findList()
             .then((response) => {
                 setProjetos(response);
-            })
-            .catch(error => console.log(error));
+            });
     }, []);
 
     const exportDatabase = async () => {
@@ -29,7 +28,6 @@ const DadosScreen = (props) => {
 
         let coletas = [];
         if(option === -1) {
-            console.log('lool')
             coletas = await ColetaService.findAll()
                 .catch(error => {
                     Alert.alert(
@@ -40,7 +38,6 @@ const DadosScreen = (props) => {
                     );
                 });
         } else {
-            console.log('lssool')
             coletas = await ColetaService.findByProjetoId(option ? option : null)
                 .catch(error => {
                     Alert.alert(
@@ -58,7 +55,18 @@ const DadosScreen = (props) => {
             });
             
             let coletasCSV = jsonToCSV(filteredColetas);
-            let fileUri = await FileService.createCacheFile('database_export.csv', coletasCSV);
+
+            let projetoName = 'Sem projeto';
+            if(option === -1){
+                projetoName = 'completo';
+            } else if(option > 0) {
+                let currProjeto = projetos.find(item => item.id == option);
+                projetoName = currProjeto.nome;
+            }
+
+            let fileName = 'collectfy_'+slugify(projetoName)+'_'+formatDate(new Date())+'.csv';
+
+            let fileUri = await FileService.createCacheFile(fileName, coletasCSV);
 
             let canShare = await Sharing.isAvailableAsync()
                 .catch((error) => {
@@ -147,10 +155,8 @@ const DadosScreen = (props) => {
                     Todas as fotografias associadas a registros de coleta são armazenadas na 
                     pasta <Text italic>"Collectfy"</Text>, em pastas com o nome do Projeto correspondente. 
                     Também estão armazenadas em álbuns de mesmo nome, na galeria do dispositivo.
-                </Text>
-                <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
                     As coletas sem projeto associado, estão na pasta e álbum de nome "Sem projeto".
-                </Text> 
+                </Text>
             </VStack>
         </ScrollView>
     );

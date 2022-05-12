@@ -12,17 +12,18 @@ const LocationControls = (props) => {
 
     const getLocationData = () => {
         setButtonLoading(true);
-        (async function() {
+        (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
 
             if (status === 'granted') {
                 try {
-                    let location = await Location.getCurrentPositionAsync({});
+                    let currLocation = await Location.getCurrentPositionAsync(
+                        { accuracy: Location.Accuracy.Highest });
 
                     props.setLocationData({
-                        latitude: location.coords.latitude.toString(),
-                        longitude: location.coords.longitude.toString(),
-                        altitude: location.coords.altitude.toString()
+                        latitude: currLocation.coords.latitude.toString(),
+                        longitude: currLocation.coords.longitude.toString(),
+                        altitude: currLocation.coords.altitude.toString()
                     })
                     setButtonLoading(false);
                 } catch(e) {

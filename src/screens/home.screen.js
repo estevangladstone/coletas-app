@@ -29,12 +29,12 @@ const HomeScreen = (props) => {
                     <Text bold italic>Collectfy</Text> é um aplicativo para anotações de coletas botânicas em campo. 
                 </Text>
 
-                <Center>
+                <Center my={1}>
                     <Image 
                         alt="app logo"
                         style={{ 
-                            width: 170,
-                            height: 170,
+                            width: 150,
+                            height: 150,
                         }}
                         source={require('../assets/imgs/app_icon.png')}
                     />

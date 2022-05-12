@@ -1,3 +1,31 @@
+const formatDate = (date) => {
+    let parsedDate = new Date(date),
+        dia  = parsedDate.getDate().toString(),
+        diaFull = (dia.length == 1) ? '0'+dia : dia,
+        mes  = (parsedDate.getMonth()+1).toString(),
+        mesFull = (mes.length == 1) ? '0'+mes : mes,
+        anoFull = parsedDate.getFullYear();
+
+    return diaFull+mesFull+anoFull;
+}
+
+const slugify = (text) => {
+  const from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+  const to = "aaaaaeeeeeiiiiooooouuuunc------";
+
+  const newText = text.split('').map(
+    (letter, i) => letter.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i)));
+
+  return newText
+    .toString()                     // Cast to string
+    .toLowerCase()                  // Convert the string to lowercase letters
+    .trim()                         // Remove whitespace from both sides of a string
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/&/g, '-y-')           // Replace & with 'and'
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-');        // Replace multiple - with single -
+}
+
 const formatDatetime = (datetime) => {
 	let parsedDate = new Date(datetime),
         dia  = parsedDate.getDate().toString(),
@@ -67,4 +95,4 @@ const formatColetaData = (model) => {
     }
 }
 
-export { formatDatetime, formatColetaData, generatePhotoName };
+export { formatDatetime, formatColetaData, generatePhotoName, formatDate, slugify };

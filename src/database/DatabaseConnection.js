@@ -9,9 +9,9 @@ export const DatabaseConnection = {
             await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'SQLite');
         }
         await FileSystem.downloadAsync(
-            Asset.fromModule(require("../assets/database/project.db")).uri,
-            FileSystem.documentDirectory + 'SQLite/project.db'
+            Asset.fromModule(require("../assets/database/collectfy.db")).uri,
+            FileSystem.documentDirectory + 'SQLite/collectfy.db'
         );
-        return SQLite.openDatabase('project.db');
+        return SQLite.openDatabase('collectfy.db');
     }
 };

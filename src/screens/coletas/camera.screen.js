@@ -12,7 +12,8 @@ import FileService from '../../services/FileService';
 
 const CameraScreen = (props) => {
 
-    const [hasPermission, setHasPermission] = useState(null);
+    const [hasCameraPermission, setHasCameraPermission] = useState(null);
+    const [hasMediaPermission, setHasMediaPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [flash, setFlash] = useState(Camera.Constants.FlashMode.auto);
     const [flashIcon, setFlashIcon] = useState('flash-auto');
@@ -26,12 +27,44 @@ const CameraScreen = (props) => {
     useEffect(() => {
         (async () => {
             const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === 'granted');
+            
+            if (status === 'granted') {
+                setHasCameraPermission(true);
+            } else {
+                setHasCameraPermission(false);
+
+                Alert.alert(
+                    "Erro",
+                    "As permissão necessária para acesso a Camera não foi concedida.",
+                    [{
+                        text: "Voltar",
+                        onPress: () => closeCamera(),
+                        style: "default",
+                    }],
+                    { cancelable: false }
+                );
+            }
         })();
 
         (async () => {
             const { status } = await MediaLibrary.requestPermissionsAsync(false);
-            setHasPermission(status === 'granted');
+
+            if (status === 'granted') {
+                setHasMediaPermission(true);
+            } else {
+                setHasMediaPermission(false);
+
+                Alert.alert(
+                    "Erro",
+                    "As permissões necessárias para acesso a Galeria não foram concedidas.",
+                    [{
+                        text: "Voltar",
+                        onPress: () => closeCamera(),
+                        style: "default",
+                    }],
+                    { cancelable: false }
+                );
+            }
         })();
     }, []);
 
@@ -41,10 +74,7 @@ const CameraScreen = (props) => {
         }
     };
 
-    // set the camera size and padding.
-    // this code assumes a portrait mode screen
     const prepareDimensions = async () => {
-        // This issue only affects Android
         if (Platform.OS === 'android') {
             const { height, width } = Dimensions.get('window');
 
@@ -70,7 +100,7 @@ const CameraScreen = (props) => {
                     if (type === Camera.Constants.Type.front) {
                         pic = await manipulateAsync(
                             pic.localUri || pic.uri,
-                            [{ rotate: 180 }, { flip: FlipType.Vertical },],
+                            [{ rotate: 180 }, { flip: FlipType.Vertical }],
                             { compress: 1, format: SaveFormat.JPEG }
                         );
                     }
@@ -117,78 +147,76 @@ const CameraScreen = (props) => {
         props.navigation.goBack();
     }
 
-    if (hasPermission === null) {
-        return <View />;
-    }
-    if (hasPermission === false) {
-        return <Text>Sem permissão de acesso a câmera.</Text>;
-    }
-    return openCamera ? 
-        (
-        <View style={styles.mainContainer}>
-            <View style={styles.cameraContainer}>
-                <Camera
-                    onCameraReady={setCameraReady}
-                    style={dimensions}
-                    ratio={'4:3'}
-                    type={type}
-                    flashMode={flash}
-                    ref={cameraRef} >
-                </Camera>
-            </View>
-            <View style={styles.controlsContainer}>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.camera_button}
-                        onPress={changeFlash} >
-                        <MaterialIcons name={flashIcon} size={40} color="white"/>    
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.camera_button}
-                        onPress={takePhoto}>
-                        <MaterialIcons name="radio-button-off" size={80} color="white"/>    
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.camera_button}
-                        onPress={changeType}>
-                        <MaterialIcons name="flip-camera-ios" size={40} color="white"/>    
-                    </TouchableOpacity>
+    if (!hasCameraPermission || !hasMediaPermission) {
+        return <View style={styles.mainContainer} />;
+    } else {
+        return openCamera ? 
+            (
+            <View style={styles.mainContainer}>
+                <View style={styles.cameraContainer}>
+                    <Camera
+                        onCameraReady={setCameraReady}
+                        style={dimensions}
+                        ratio={'4:3'}
+                        type={type}
+                        flashMode={flash}
+                        ref={cameraRef} >
+                    </Camera>
+                </View>
+                <View style={styles.controlsContainer}>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.camera_button}
+                            onPress={changeFlash} >
+                            <MaterialIcons name={flashIcon} size={40} color="white"/>    
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.camera_button}
+                            onPress={takePhoto}>
+                            <MaterialIcons name="radio-button-off" size={80} color="white"/>    
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.camera_button}
+                            onPress={changeType}>
+                            <MaterialIcons name="flip-camera-ios" size={40} color="white"/>    
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
-        </View>
-        )
-        : 
-        (<View style={styles.mainContainer}>
-            <View style={styles.cameraContainer}>
-                <Image 
-                    style={dimensions}
-                    source={{ uri:photo }} />
-            </View>
-            <View style={styles.controlsContainer}>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.camera_button}
-                        onPress={closeCamera}>
-                        <MaterialIcons name="close" size={40} color="white"/>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.camera_button}
-                        onPress={() => setOpenCamera(true)}>
-                        <MaterialIcons name="replay" size={80} color="white"/>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.camera_button}
-                        onPress={async () => {
-                            //props.savePhoto(photo);
-                            await savePhoto();
-                            closeCamera();
-                        }}>
-                        <MaterialIcons name="check" size={40} color="white"/>
-                    </TouchableOpacity>
+            )
+            : 
+            (<View style={styles.mainContainer}>
+                <View style={styles.cameraContainer}>
+                    <Image 
+                        style={dimensions}
+                        source={{ uri:photo }} />
+                </View>
+                <View style={styles.controlsContainer}>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.camera_button}
+                            onPress={closeCamera}>
+                            <MaterialIcons name="close" size={40} color="white"/>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.camera_button}
+                            onPress={() => setOpenCamera(true)}>
+                            <MaterialIcons name="replay" size={80} color="white"/>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.camera_button}
+                            onPress={async () => {
+                                //props.savePhoto(photo);
+                                await savePhoto();
+                                closeCamera();
+                            }}>
+                            <MaterialIcons name="check" size={40} color="white"/>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
-        </View>
-        );
+            );
+    }
 
 }
 
