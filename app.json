@@ -24,7 +24,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/imgs/app_adaptative-icon.png"
       },
-      "package": "com.estevangnm.Project",
+      "package": "com.projeto.collectfy",
       "permissions": [ "CAMERA", "ACCESS_FINE_LOCATION", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE" ]
     },
     "web": {

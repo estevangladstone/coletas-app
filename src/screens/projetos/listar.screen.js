@@ -27,7 +27,6 @@ const ListarProjetoScreen = (props) => {
     const listar = () => {
         ProjetoService.fetchMore(7, 0)
             .then(response => {
-                console.log(response)
                 if(response.length == 0) {
                     setHaveMore(false);
                 }

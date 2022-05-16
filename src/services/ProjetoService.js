@@ -1,23 +1,23 @@
-import { DatabaseConnection } from '../database/DatabaseConnection';
+// import { DatabaseConnection } from '../database/DatabaseConnection';
 import FotoService from './FotoService';
 import * as MediaLibrary from 'expo-media-library';
 
 
 const table = "projetos"
-const db = DatabaseConnection.getConnection();
+const db = require('../database/DatabaseConnection');
+const conn = db.getConnection();
 
 export default class ProjetoService {
 
     static async addData(model) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `INSERT INTO ${table} (nome, descricao, created_at, updated_at) 
                     VALUES (?, ?, ?, ?);`, 
                     [model.nome, model.descricao, model.created_at, model.updated_at],
                     async (txObj, { insertId, rows }) => { resolve(insertId) },
-                    (txObj, error) => console.log('Error', error)
+                    (txObj, error) => {}
                 );
             })
         );
@@ -55,13 +55,11 @@ export default class ProjetoService {
     }
 
     static async moveAlbum(fromName, toName) {
-        console.log('comeco')
         let oldAlbum = await MediaLibrary.getAlbumAsync(fromName);
         if(oldAlbum) {
             let oldAlbumPagedInfo = await MediaLibrary.getAssetsAsync({ album: oldAlbum });
             let newAlbum = await MediaLibrary.getAlbumAsync(toName);
             let recentTimestamp = null;
-            console.log('ei')
 
             let hasAssets = oldAlbumPagedInfo.assets.length > 0 ? true : false;
             while(hasAssets) {
@@ -96,30 +94,26 @@ export default class ProjetoService {
             }
 
             await MediaLibrary.deleteAlbumsAsync([oldAlbum.id]);
-            console.log('lold')
         }
-        console.log('aqui')
     }
 
     static async updateData(model) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `UPDATE ${table} set nome = ?, descricao = ?, updated_at = ?
                     WHERE id = ?;`, 
                     [model.nome, model.descricao, model.updated_at, model.id],
                     (txObj) => resolve(),
-                    (txObj, error) => { console.log('Error', error); }
+                    (txObj, error) => {}
                 )
             })
         );
     }
 
     static async delete(id) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `UPDATE coletas SET projeto_id = NULL WHERE projeto_id = ?`,
                     [id]
@@ -129,7 +123,7 @@ export default class ProjetoService {
                     `DELETE FROM ${table} WHERE id = ?;`, 
                     [id], 
                     () => resolve(true),
-                    (txObj, error) => console.log('Error', error)    
+                    (txObj, error) => {}    
                 )
             })
         );
@@ -139,31 +133,27 @@ export default class ProjetoService {
         let raw_projetos = await this.findById(id);
         let currProjeto = raw_projetos._array[0];
 
-        console.log('1')
         await this.moveAlbum(currProjeto.nome, 'Sem projeto');
-        console.log('2')
+
         return await this.delete(id);
-        console.log('3')
     }
 
     static async findById(id) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT * FROM ${table} WHERE id = ?;`,
                     [id],
                     (txObj, { rows }) => resolve(rows), 
-                    (txObj, error) => console.log('Error ', error)
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async findByNome(nome) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT * FROM ${table} WHERE nome = ?;`,
                     [nome],
@@ -172,30 +162,28 @@ export default class ProjetoService {
                             resolve(rows._array[0])
                         } else { resolve(null) }
                     }, 
-                    (txObj, error) => console.log('Error ', error)
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async findList() {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT id, nome FROM ${table} ORDER BY id ASC;`,
                     null,
                     (txObj, { rows }) => { resolve(rows._array) }, 
-                    (txObj, error) => { console.log('Error ', error) }
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async fetchMore(limit, offset=0) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT p.id, p.nome, p.descricao, p.updated_at, COUNT(c.id) as qtd_coletas 
                     FROM ${table} p
@@ -205,7 +193,7 @@ export default class ProjetoService {
                     LIMIT ?, ? ;`,
                     [offset, limit],
                     (txObj, { rows }) => { resolve(rows._array) }, 
-                    (txObj, error) => { console.log('Error ', error) }
+                    (txObj, error) => {}
                 );
             })
         );   

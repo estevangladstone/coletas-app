@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, KeyboardAvoidingView, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, View, BackHandler } from 'react-native';
+import { HeaderBackButton } from '@react-navigation/elements';
 import { 
     ScrollView, VStack, Button, Divider, Heading, HStack, Icon
 } from 'native-base';
@@ -32,7 +33,29 @@ const EditarProjetoScreen = (props) => {
                 [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
             );
         });
+        
+        const backAction = () => {
+            confirmExit();
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+
+        return () => backHandler.remove();
     }, []);
+
+    React.useLayoutEffect(() => {
+        props.navigation.setOptions({
+            headerLeft: () => 
+                <HeaderBackButton 
+                    tintColor='#fafafa'
+                    style={{
+                        marginLeft: -3,
+                        marginRight: 30
+                    }}
+                    onPress={confirmExit}/>
+        });
+    }, [props.navigation]);
 
     const validate = async () => {
         if(!projeto.nome) {
@@ -82,11 +105,15 @@ const EditarProjetoScreen = (props) => {
 
     const confirmExit = () => {
         Alert.alert(
-            "Atenção",
-            "Tem certeza que quer descartar os dados preenchidos?",
+            "Confirmar",
+            "Caso tenha feito alterações, elas serão descartadas.",
             [
-                { text: "NÃO", style: "cancel" },
-                { text: "SIM", onPress: async () => props.navigation.goBack(), style: "destructive" },
+                { text: "CANCELAR", style: "cancel" },
+                { 
+                    text: "SAIR", 
+                    onPress: async () => props.navigation.goBack(),
+                    style: "destructive"
+                },
             ],
             { cancelable: true }
         );

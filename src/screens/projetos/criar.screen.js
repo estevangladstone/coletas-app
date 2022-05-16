@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, KeyboardAvoidingView } from 'react-native';
+import { HeaderBackButton } from '@react-navigation/elements';
+import { Alert, KeyboardAvoidingView, BackHandler } from 'react-native';
 import { ScrollView, VStack, Button, Divider, Heading } from 'native-base';
 import TextField from '../coletas/components/text-field';
 import TextAreaField from '../coletas/components/textarea-field';
@@ -12,6 +13,30 @@ const CriarProjetoScreen = (props) => {
     const [projeto, setProjeto] = useState(new Projeto);
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const backAction = () => {
+            confirmExit();
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+
+        return () => backHandler.remove();
+    }, []);
+
+    React.useLayoutEffect(() => {
+        props.navigation.setOptions({
+            headerLeft: () => 
+                <HeaderBackButton 
+                    tintColor='#fafafa'
+                    style={{
+                        marginLeft: -3,
+                        marginRight: 30
+                    }}
+                    onPress={confirmExit}/>
+        });
+    }, [props.navigation]);
 
     const validate = async () => {
         if(!projeto.nome) {
@@ -67,8 +92,8 @@ const CriarProjetoScreen = (props) => {
             "Atenção",
             "Tem certeza que quer descartar os dados preenchidos?",
             [
-                { text: "NÃO", style: "cancel" },
-                { text: "SIM", onPress: async () => props.navigation.goBack(), style: "destructive" },
+                { text: "CANCELAR", style: "cancel" },
+                { text: "SAIR", onPress: async () => props.navigation.goBack(), style: "destructive" },
             ],
             { cancelable: true }
         );

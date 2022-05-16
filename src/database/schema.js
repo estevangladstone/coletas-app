@@ -1,7 +1,7 @@
 const coletas = [
     // `DELETE FROM coletas`,
     
-    `DROP TABLE IF EXISTS coletas`,
+    // `DROP TABLE IF EXISTS coletas`,
 
     `CREATE TABLE IF NOT EXISTS coletas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +30,7 @@ const coletas = [
 const configuracoes = [
     // `DELETE FROM configuracoes`,
     
-    `DROP TABLE IF EXISTS configuracoes`,
+    // `DROP TABLE IF EXISTS configuracoes`,
 
     `CREATE TABLE IF NOT EXISTS configuracoes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +42,7 @@ const configuracoes = [
 const fotos = [
     // `DELETE FROM fotos`,
     
-    `DROP TABLE IF EXISTS fotos`,
+    // `DROP TABLE IF EXISTS fotos`,
    
     `CREATE TABLE IF NOT EXISTS fotos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +56,7 @@ const fotos = [
 const projetos = [
     // `DELETE FROM projetos`,
     
-    `DROP TABLE IF EXISTS projetos`,
+    // `DROP TABLE IF EXISTS projetos`,
     
     `CREATE TABLE IF NOT EXISTS projetos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, BackHandler, View, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { HeaderBackButton } from '@react-navigation/elements';
 import { Heading, Button, VStack, HStack, Image, Divider, Select, CheckIcon } from 'native-base';
 
 import Coleta from '../../models/Coleta';
@@ -44,6 +45,15 @@ const CriarColetaScreen = (props) => {
         }
 
         prepare();
+
+        const backAction = () => {
+            confirmExit();
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+
+        return () => backHandler.remove();
     }, []);
 
     useEffect(() => {
@@ -52,6 +62,19 @@ const CriarColetaScreen = (props) => {
         });
 
         return unsubscribe;
+    }, [props.navigation]);
+
+    React.useLayoutEffect(() => {
+        props.navigation.setOptions({
+            headerLeft: () => 
+                <HeaderBackButton 
+                    tintColor='#fafafa'
+                    style={{
+                        marginLeft: -3,
+                        marginRight: 30
+                    }}
+                    onPress={confirmExit}/>
+        });
     }, [props.navigation]);
 
     const validate = async () => {
@@ -102,7 +125,6 @@ const CriarColetaScreen = (props) => {
                     [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }]);
             }
         }).catch((erro) => {
-            console.log(erro)
             setIsLoading(false);
             Alert.alert(
                 "Erro",
@@ -116,8 +138,8 @@ const CriarColetaScreen = (props) => {
             "Atenção",
             "Tem certeza que quer descartar os dados preenchidos (incluíndo fotos)?",
             [
-                { text: "NÃO", style: "cancel" },
-                { text: "SIM", onPress: async () => {
+                { text: "CANCELAR", style: "cancel" },
+                { text: "SAIR", onPress: async () => {
                     await FileService.deleteTempFile();
                     props.navigation.goBack();
                 }, style: "destructive" },

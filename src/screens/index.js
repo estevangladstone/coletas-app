@@ -7,6 +7,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import HomeScreen from './home.screen';
 import ListarColetaScreen from './coletas/listar.screen';
+import VisualizarColetaScreen from './coletas/visualizar.screen';
 import EditarColetaScreen from './coletas/editar.screen';
 import CriarColetaScreen from './coletas/criar.screen';
 import CameraScreen from './coletas/camera.screen';
@@ -18,29 +19,9 @@ import VisualizarProjetoScreen from './projetos/visualizar.screen';
 import DadosScreen from './dados/';
 import SobreScreen from './sobre/';
 
+
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
-
-const MenuOptions = (props) => {
-  	return ( 
-		<Menu 
-			w="190"
-			trigger={(triggerProps) => 
-				(<TouchableOpacity 
-					style={{ marginLeft: '-10%', paddingRight:'20%' }}
-					accessibilityLabel="Menu de navegação" {...triggerProps}>
-					<HamburgerIcon size="sm" style={{ color:'#fafafa'}}/>
-				</TouchableOpacity>)
-			}>
-			<Menu.Item onPress={() => props.navigation.navigate('Home')}>Início</Menu.Item>
-			<Menu.Item onPress={() => props.navigation.navigate('Coletas')}>Coletas</Menu.Item>
-			<Menu.Item onPress={() => props.navigation.navigate('Projetos')}>Projetos</Menu.Item>
-			<Menu.Item onPress={() => props.navigation.navigate('Dados')}>Exportar Dados</Menu.Item>
-			<Menu.Item onPress={() => props.navigation.navigate('Configuracoes')}>Configurações</Menu.Item>
-			<Menu.Item onPress={() => props.navigation.navigate('Sobre')}>Sobre</Menu.Item>
-		</Menu>
-	);
-}
 
 const NavigationTabs = () => {
 	return (
@@ -96,6 +77,12 @@ const NavigationStack = () => {
 	            name="Criar" 
 	            component={ CriarColetaScreen }
 	            options={{ title:'Nova Coleta' }} />
+	        <Stack.Screen 
+	            name="Visualizar" 
+	            component={ VisualizarColetaScreen }
+	            options={(props) => {
+	            	return {title:props.route.params.title}; 
+	         	}} />
 	        <Stack.Screen 
 	            name="Editar" 
 	            component={ EditarColetaScreen }

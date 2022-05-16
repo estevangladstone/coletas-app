@@ -68,7 +68,6 @@ const styles = StyleSheet.create({
         borderColor: '#ee4343',
     },
     input_field__disabled: {
-        opacity: 0.8,
         backgroundColor: '#f5f5f5',
     },
     input_error_message: {

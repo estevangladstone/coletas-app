@@ -1,29 +1,23 @@
-import { DatabaseConnection } from './DatabaseConnection';
 import { schema } from './schema';
 
 
 export const DatabaseInit = () => {
 
-    var db = null
-    db = DatabaseConnection.getConnection();
-    db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () => {
-        console.log('Foreign keys turned on');
-    });
+    let db = require('../database/DatabaseConnection');
+    let conn = db.getConnection();
+    
+    conn.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () => {});
 
-    var sql = schema;
+    let sql = schema;
 
-    db.transaction(
+    conn.transaction(
         tx => {
             for (var i = 0; i < sql.length; i++) {
-                console.log("execute sql : " + sql[i]);
                 tx.executeSql(sql[i]);
             }
-        }, (error) => {
-            console.log("error call back : " + JSON.stringify(error));
-            console.log(error);
-        }, () => {
-            console.log("transaction complete call back ");
-        }
+        }, 
+        () => {},
+        () => {}
     );
 
 }

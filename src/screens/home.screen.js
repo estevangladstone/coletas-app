@@ -10,17 +10,20 @@ const HomeScreen = (props) => {
     const [firstUseFlag, setFirstUseFlag] = useState(false);
 
     useEffect(() => {
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            checkFirstUse();
+        });
+
+        return unsubscribe;
+    }, [props.navigation]);
+
+    const checkFirstUse = () => {
         ConfiguracaoService.findByNome('configured_flag')
         .then(response => {
             setFirstUseFlag(response ? false : true)
         })
         .catch((error) => {});
-    }, []);
-
-    const firstConfiguration = () => {
-        setFirstUseFlag(false);
-        props.navigation.navigate('Configuracoes');
-    } 
+    }
 
     return (
         <SafeAreaView style={{flex:1}}>
@@ -46,7 +49,7 @@ const HomeScreen = (props) => {
                         borderRadius: 5,
                         backgroundColor: '#f59e0b'
                     }}
-                    onPress={() => firstConfiguration() }>
+                    onPress={() => props.navigation.navigate('Configuracoes') }>
                     <Box px={5} py={3} >
                         <Heading underline size="sm" color="#fafafa">Primeiros passos</Heading>
                         <Text

@@ -52,14 +52,16 @@ const DatetimeField = (props) => {
 
     return (
         <View>
-            <FormControl isInvalid={props.isInvalid} mb="1" isDisabled={props.isDisabled}>
+            <FormControl isInvalid={props.isInvalid} mb="1">
                 <HStack space={2}>
                     <Pressable onPress={() => showDatepicker()} w="49%">
                         <FormControl.Label _text={{bold: true, color:'#404040'}} mb="0">Data</FormControl.Label>
                         <Input
-                            bg='#e5e5e5'
                             color='black'
                             isReadOnly
+                            style={{
+                                backgroundColor: props.isDisabled ? '#f5f5f5' : '#e5e5e5'
+                            }}
                             variant="filled"
                             size="lg"
                             value={maskedDate}/>
@@ -67,7 +69,9 @@ const DatetimeField = (props) => {
                     <Pressable onPress={() => showTimepicker()} w="49%">
                         <FormControl.Label _text={{bold: true, color:'#404040'}} mb="0">Hora</FormControl.Label>
                         <Input
-                            bg='#e5e5e5'
+                            style={{ 
+                                backgroundColor: props.isDisabled ? '#f5f5f5' : '#e5e5e5' 
+                            }}
                             color='black'
                             isReadOnly
                             variant="filled"

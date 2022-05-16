@@ -27,6 +27,7 @@ const LocationControls = (props) => {
                     })
                     setButtonLoading(false);
                 } catch(e) {
+                    setButtonLoading(false);
                     Alert.alert(
                         "Erro",
                         "Não foi possível obter a Localização. Confira se o GPS está LIGADO e tente novamente.",

@@ -23,7 +23,6 @@ const VisualizarProjetoScreen = (props) => {
     useEffect(() => {
         ProjetoService.findById(props.route.params.id)
         .then((response) => { 
-            console.log(response._array[0]);
             setProjeto(response._array[0]);
         })
         .catch((error) => {
@@ -44,10 +43,8 @@ const VisualizarProjetoScreen = (props) => {
     }, [props.navigation]);
 
     const listar = () => {
-        console.log('aloo')
         ColetaService.fetchMoreByProjeto(props.route.params.id, 7, 0)
             .then(response => {
-                console.log(response)
                 if(response.length == 0) {
                     setHaveMore(false);
                 }

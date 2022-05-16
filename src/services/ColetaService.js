@@ -1,4 +1,4 @@
-import { DatabaseConnection } from '../database/DatabaseConnection';
+// import { DatabaseConnection } from '../database/DatabaseConnection';
 import FileService from './FileService';
 import ConfiguracaoService from './ConfiguracaoService';
 import ProjetoService from './ProjetoService';
@@ -7,14 +7,14 @@ import * as MediaLibrary from 'expo-media-library';
 
 
 const table = "coletas"
-const db = DatabaseConnection.getConnection();
+const db = require('../database/DatabaseConnection');
+const conn = db.getConnection();
 
 export default class ColetaService {
 
     static async addData(model) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `INSERT INTO ${table} (data_hora, coletor_principal, outros_coletores,
                     numero_coleta, especie, familia, habito_crescimento, descricao_especime,
@@ -28,7 +28,7 @@ export default class ColetaService {
                     model.pais, model.estado, model.localidade, model.observacoes,
                     model.projeto_id],
                     async (txObj, { insertId, rows }) => { resolve(insertId) },
-                    (txObj, error) => console.log('Error', error)
+                    (txObj, error) => {}
                 );
             })
         );
@@ -173,11 +173,15 @@ export default class ColetaService {
 
             // obter fotos associadas ao projeto
             let photosToMove = await this.getPhotosListById(model.id);
-            let album = await MediaLibrary.getAlbumAsync(projetoName);    
+            let album = await MediaLibrary.getAlbumAsync(projetoName); 
+            let recentTimestamp = null;   
             // para cada foto, mover para a nova pasta
             for(let i=0; i<photosToMove.length; i++) {
                 let assetToMove = await MediaLibrary.getAssetInfoAsync(photosToMove[i].asset_id);
-                let creationTimestamp = assetToMove.creationTime - 1;
+
+                if(!recentTimestamp) {
+                    recentTimestamp = assetToMove.creationTime - 1;
+                }
 
                 if(!album) {
                     album = await MediaLibrary.createAlbumAsync('Collectfy'+ (projetoName ? '/'+projetoName : '/Sem projeto'), assetToMove, false);
@@ -187,9 +191,10 @@ export default class ColetaService {
 
                 // obtem a lista de assets do album criados após a timestamp de referencia
                 let albumPagedInfo = await MediaLibrary.getAssetsAsync(
-                    {album: album, createdAfter: creationTimestamp});
+                    {album: album, createdAfter: recentTimestamp});
                 // obtem asset criado mais recentemente
                 let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
+                recentTimestamp = movedAsset.creationTime - 1;
                 // cria o registro de foto no banco de dados
                 await FotoService.updateById(
                     photosToMove[i].id, movedAsset.uri, movedAsset.id, model.id);
@@ -214,14 +219,13 @@ export default class ColetaService {
             await FotoService.deleteByColeta(id);
         }
 
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `DELETE FROM ${table} WHERE id = ?;`, 
                     [id], 
                     () => resolve(true),
-                    (txObj, error) => console.log('Error', error)    
+                    (txObj, error) => {}    
                 )
             })
         );
@@ -229,9 +233,8 @@ export default class ColetaService {
 
     // TODO: Permitir alterar por valores escolhidos
     static async updateData(model) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `UPDATE ${table} SET data_hora = ?, coletor_principal = ?,
                     outros_coletores = ?, numero_coleta = ?, especie = ?, familia = ?,
@@ -245,44 +248,41 @@ export default class ColetaService {
                     model.altitude, model.pais, model.estado, model.localidade, 
                     model.observacoes, model.projeto_id, model.id],
                     (txObj) => resolve(),
-                    (txObj, error) => { console.log('Error', error); }
+                    (txObj, error) => {}
                 )
             })
         );
     }
 
     static async updateProjetoById(projeto_id, id) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `UPDATE ${table} SET projeto_id = ? WHERE id = ?;`,
                     [projeto_id, id],
                     () => resolve(true),
-                    (txObj, error) => { console.log('Error', error); }
+                    (txObj, error) => {}
                 )
             })
         );
     }
 
     static async findById(id) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT * FROM ${table} WHERE id = ?;`,
                     [id],
                     (txObj, { rows }) => resolve(rows), 
-                    (txObj, error) => console.log('Error ', error)
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async findByNumeroColeta(numero_coleta) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT * FROM ${table} WHERE numero_coleta = ?;`,
                     [numero_coleta],
@@ -291,30 +291,28 @@ export default class ColetaService {
                             resolve(rows._array[0])
                         } else { resolve(null) }
                     }, 
-                    (txObj, error) => console.log('Error ', error)
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async findAll() {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT * FROM ${table} ORDER BY id DESC;`,
                     null,
                     (txObj, { rows }) => { resolve(rows._array) }, 
-                    (txObj, error) => { console.log('Error ', error) }
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async fetchMore(limit, offset=0) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT c.id, c.data_hora, c.numero_coleta, c.especie, c.localidade,
                     f.uri as thumbnail
@@ -329,16 +327,15 @@ export default class ColetaService {
                     LIMIT ? OFFSET ? ;`,
                     [limit, offset],
                     (txObj, { rows }) => resolve(rows._array), 
-                    (txObj, error) => { console.log('Error ', error) }
+                    (txObj, error) => {}
                 );
             })
         );   
     }
 
     static async fetchMoreByProjeto(projeto_id, limit, offset=0) {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT c.id, c.data_hora, c.numero_coleta, c.especie, c.localidade,
                     f.uri as thumbnail
@@ -354,7 +351,7 @@ export default class ColetaService {
                     LIMIT ? OFFSET ? ;`,
                     [projeto_id, limit, offset],
                     (txObj, { rows }) => resolve(rows._array), 
-                    (txObj, error) => { console.log('Error ', error) }
+                    (txObj, error) => {}
                 );
             })
         );   
@@ -373,9 +370,8 @@ export default class ColetaService {
     }
 
     static async getMaxNumeroColeta() {
-        // const db = await DatabaseConnection.getConnection();
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     `SELECT MAX(numero_coleta) AS num FROM ${table};`,
                     null,
@@ -386,14 +382,13 @@ export default class ColetaService {
                             resolve(0); // se não há coleta, retornar 0 
                         }
                     }, 
-                    (txObj, error) => console.log('Error ', error)
+                    (txObj, error) => {}
                 );
             })
         );
     }
 
     static async findByProjetoId(projeto_id) {
-        // const db = await DatabaseConnection.getConnection();
         let query = ''; 
         let args = []; 
         if(projeto_id) {
@@ -403,12 +398,12 @@ export default class ColetaService {
             query = `SELECT * FROM ${table} WHERE projeto_id IS NULL ORDER BY id DESC;`;
         }
         return new Promise(
-            (resolve, reject) => db.transaction(tx => {
+            (resolve, reject) => conn.transaction(tx => {
                 tx.executeSql(
                     query,
                     args,
                     (txObj, { rows }) => { resolve(rows._array) }, 
-                    (txObj, error) => { console.log('Error ', error) }
+                    (txObj, error) => {}
                 );
             })
         );

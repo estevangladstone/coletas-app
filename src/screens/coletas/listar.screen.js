@@ -30,7 +30,6 @@ const ListarColetaScreen = (props) => {
                 if(response.length == 0) {
                     setHaveMore(false);
                 }
-                console.log('30 = ', response)
                 setColetas(response);
                 setIsLoading(false);
             });
@@ -43,7 +42,6 @@ const ListarColetaScreen = (props) => {
         await ColetaService.fetchMore(5, coletas.length)
             .then(response => {
                 if(response.length == 0) {
-                    console.log('32 = ', response)
                     setHaveMore(false);
                 } else {
                     setColetas([...coletas, ...response]);
@@ -63,7 +61,7 @@ const ListarColetaScreen = (props) => {
                         onEndReachedThreshold={0}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => props.navigation.navigate('Editar', { 
+                                onPress={() => props.navigation.navigate('Visualizar', { 
                                     id: item.id,
                                     title: item.numero_coleta ? 'Coleta #'+item.numero_coleta : 'Coleta S/N'
                                 })}>
@@ -76,8 +74,8 @@ const ListarColetaScreen = (props) => {
                 </Box> : null }
                 { coletas.length == 0 && !haveMore ? 
                 <Box style={{
-                        justifyContent: 'center', //Centered horizontally
-                        alignItems: 'center', //Centered vertically
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         flex:0.7 
                     }}>
                     <MaterialCommunityIcons name="leaf" size={100} color="#a3a3a3"/>
