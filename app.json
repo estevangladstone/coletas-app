@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Collectfy",
-    "slug": "collectfy",
+    "name": "Coletas+",
+    "slug": "coletas-mais",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/imgs/app_icon.png",
@@ -24,7 +24,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/imgs/app_adaptative-icon.png"
       },
-      "package": "com.projeto.collectfy",
+      "package": "com.projeto.coletasMais",
       "permissions": [ "CAMERA", "ACCESS_FINE_LOCATION", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE" ]
     },
     "web": {

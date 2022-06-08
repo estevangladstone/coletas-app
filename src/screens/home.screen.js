@@ -29,7 +29,7 @@ const HomeScreen = (props) => {
         <SafeAreaView style={{flex:1}}>
             <ScrollView px={5} bg="#fafafa">
                 <Text fontSize="lg" mt={2} style={{ textAlign: 'center', color: '#404040' }}>
-                    <Text bold italic>Collectfy</Text> é um aplicativo para anotações de coletas botânicas em campo. 
+                    <Text bold italic>Coletas+</Text> é um aplicativo para anotações de coletas botânicas em campo. 
                 </Text>
 
                 <Center my={1}>

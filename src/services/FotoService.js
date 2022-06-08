@@ -81,9 +81,12 @@ export default class FotoService {
                 tx.executeSql(
                     `SELECT * FROM ${table} WHERE asset_id = ?;`, 
                     [assetId], 
-                    (txObj, { rows }) => { 
-                        console.log('fotos = ', rows);
-                        resolve(rows._array[0]);
+                    (txObj, { rows }) => {
+                        if(rows._array.length > 0) {
+                            resolve(rows._array[0]);
+                        } else {
+                            resolve(null);
+                        } 
                     },
                     (txObj, error) => {}    
                 )

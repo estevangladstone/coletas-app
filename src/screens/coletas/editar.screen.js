@@ -4,6 +4,7 @@ import { HeaderBackButton } from '@react-navigation/elements';
 import { useFocusEffect } from '@react-navigation/native';
 import { Heading, Button, VStack, HStack, Image, Icon, Divider, Switch } from 'native-base';
 import { MaterialIcons } from "@expo/vector-icons";
+import * as MediaLibrary from 'expo-media-library';
 
 import ColetaService from '../../services/ColetaService';
 import FileService from '../../services/FileService';
@@ -33,6 +34,21 @@ const EditarColetaScreen = (props) => {
     useEffect(() => {
         async function prepare() {
             await FileService.deleteTempFile();
+
+            const { status } = await MediaLibrary.requestPermissionsAsync(false);
+
+            if (status !== 'granted') {
+                Alert.alert(
+                    "Erro",
+                    "As permissões necessárias para acesso a Galeria não foram concedidas.",
+                    [{
+                        text: "Voltar",
+                        onPress: () => props.navigation.goBack(),
+                        style: "default",
+                    }],
+                    { cancelable: false }
+                );
+            }
             
             const numCol = await ConfiguracaoService.findNextNumeroColeta();
             setNextNumeroColeta(numCol);

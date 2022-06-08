@@ -5,7 +5,7 @@ import { Asset } from 'expo-asset';
 
 class Database {
     getConnection() {
-        return SQLite.openDatabase('collectfy.db');
+        return SQLite.openDatabase('coletasMais.db');
     }
 };
 

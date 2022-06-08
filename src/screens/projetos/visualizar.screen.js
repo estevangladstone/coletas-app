@@ -9,6 +9,7 @@ import ProjetoService from '../../services/ProjetoService';
 import ColetaService from '../../services/ColetaService';
 import ColetaCard from '../coletas/components/coleta-card';
 import { formatDatetime } from '../../helpers';
+import * as MediaLibrary from 'expo-media-library';
 
 
 const VisualizarProjetoScreen = (props) => {
@@ -81,13 +82,28 @@ const VisualizarProjetoScreen = (props) => {
     }
 
     const deleteProjeto = async () => {
-        ProjetoService.deleteById(projeto.id).then(() => {
+        const { status } = await MediaLibrary.requestPermissionsAsync(false);
+
+        if (status === 'granted') {
+            ProjetoService.deleteById(projeto.id).then(() => {
+                Alert.alert(
+                    "Sucesso",
+                    "O Projeto foi removido com sucesso.",
+                    [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
+                );
+            });
+        } else {
             Alert.alert(
-                "Sucesso",
-                "O Projeto foi removido com sucesso.",
-                [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
+                "Erro",
+                "As permissões necessárias para acesso a Galeria não foram concedidas.",
+                [{
+                    text: "Voltar",
+                    onPress: () => props.navigation.goBack(),
+                    style: "default",
+                }],
+                { cancelable: false }
             );
-        });
+        }
     }
 
     return (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Alert, View, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { Heading, Button, VStack, HStack, Image, Icon, Divider } from 'native-base';
 import { MaterialIcons } from "@expo/vector-icons";
+import * as MediaLibrary from 'expo-media-library';
 
 import ColetaService from '../../services/ColetaService';
 import ProjetoService from '../../services/ProjetoService';
@@ -75,13 +76,28 @@ const EditarColetaScreen = (props) => {
     }
 
     const deleteColeta = async () => {
-        ColetaService.deleteById(coleta.id).then(() => {
+        const { status } = await MediaLibrary.requestPermissionsAsync(false);
+
+        if (status === 'granted') {
+            ColetaService.deleteById(coleta.id).then(() => {
+                Alert.alert(
+                    "Sucesso",
+                    "O registro de Coleta foi removido com sucesso.",
+                    [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
+                );
+            });
+        } else {
             Alert.alert(
-                "Sucesso",
-                "O registro de Coleta foi removido com sucesso.",
-                [{ text: "OK", onPress: () => props.navigation.goBack(), style: "default" }],
+                "Erro",
+                "As permissões necessárias para acesso a Galeria não foram concedidas.",
+                [{
+                    text: "Voltar",
+                    onPress: () => props.navigation.goBack(),
+                    style: "default",
+                }],
+                { cancelable: false }
             );
-        });
+        }
     }
 
     return (

@@ -10,6 +10,7 @@ import TextField from '../coletas/components/text-field';
 import TextAreaField from '../coletas/components/textarea-field';
 import ProjetoService from '../../services/ProjetoService';
 import Projeto from '../../models/Projeto';
+import * as MediaLibrary from 'expo-media-library';
 
 
 const EditarProjetoScreen = (props) => {
@@ -21,6 +22,23 @@ const EditarProjetoScreen = (props) => {
     const [currNome, setCurrNome] = useState(false);
 
     useEffect(() => {
+        (async () => {
+            const { status } = await MediaLibrary.requestPermissionsAsync(false);
+
+            if (status !== 'granted') {
+                Alert.alert(
+                    "Erro",
+                    "As permissões necessárias para acesso a Galeria não foram concedidas.",
+                    [{
+                        text: "Voltar",
+                        onPress: () => props.navigation.goBack(),
+                        style: "default",
+                    }],
+                    { cancelable: false }
+                );
+            }
+        })();
+
         ProjetoService.findById(props.route.params.id)
         .then((response) => { 
             setProjeto(response._array[0]);
@@ -90,7 +108,7 @@ const EditarProjetoScreen = (props) => {
                 "Sucesso",
                 "Projeto atualizado com sucesso!",
                 [{  text: "OK",
-                    onPress: () => props.navigation.goBack(),
+                    onPress: () => props.navigation.navigate('Projetos'),
                     style: "default" }],
                 { cancelable: true });
         })

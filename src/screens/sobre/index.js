@@ -9,7 +9,7 @@ const SobreScreen = () => {
         <SafeAreaView style={{flex: 1}}>
             <ScrollView px={3} bg="#fafafa">
                 <Center m={2}>                
-                    <Heading mb={2}>Collectfy</Heading> 
+                    <Heading mb={2}>Coletas+</Heading> 
 
                     <View style={{
                         borderRadius: 95,
@@ -29,7 +29,7 @@ const SobreScreen = () => {
                 </Center>
 
                 <Text fontSize="md" style={{ textAlign: 'justify' }} mb={2}>
-                    <Text bold italic>Collectfy</Text> é um aplicativo móvel para anotações de coletas botânicas em campo.   
+                    <Text bold italic>Coletas+</Text> é um aplicativo móvel para anotações de coletas botânicas em campo.   
                 </Text>
                 <Text fontSize="md" style={{ textAlign: 'justify' }}>
                     Este aplicativo foi desenvolvido como parte do Trabalho de Conclusão de Curso do Bacharelado em Ciência da Computação da UFRJ.

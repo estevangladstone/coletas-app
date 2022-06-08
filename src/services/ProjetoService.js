@@ -65,24 +65,26 @@ export default class ProjetoService {
             while(hasAssets) {
                 for(let i=0; i<oldAlbumPagedInfo.assets.length; i++) {
                     let oldFoto = await FotoService.findByAsset(oldAlbumPagedInfo.assets[i].id);
+                    
+                    if(oldFoto) {
+                        if(!recentTimestamp) {
+                            recentTimestamp = oldAlbumPagedInfo.assets[i].creationTime - 1;
+                        }
 
-                    if(!recentTimestamp) {
-                        recentTimestamp = oldAlbumPagedInfo.assets[i].creationTime - 1;
+                        if(!newAlbum) {
+                            newAlbum = await MediaLibrary.createAlbumAsync('Coletas+/'+toName, oldAlbumPagedInfo.assets[i], false);
+                        } else {
+                            await MediaLibrary.addAssetsToAlbumAsync([oldAlbumPagedInfo.assets[i]], newAlbum, false);
+                        }
+
+                        let newAlbumPagedInfo = await MediaLibrary.getAssetsAsync(
+                            {album: newAlbum, createdAfter: recentTimestamp});
+                        let movedAsset = newAlbumPagedInfo.assets[newAlbumPagedInfo.assets.length - 1];
+                        recentTimestamp = movedAsset.creationTime - 1;
+
+                        await FotoService.updateById(
+                            oldFoto.id, movedAsset.uri, movedAsset.id, oldFoto.coleta_id);
                     }
-
-                    if(!newAlbum) {
-                        newAlbum = await MediaLibrary.createAlbumAsync('Collectfy/'+toName, oldAlbumPagedInfo.assets[i], false);
-                    } else {
-                        await MediaLibrary.addAssetsToAlbumAsync([oldAlbumPagedInfo.assets[i]], newAlbum, false);
-                    }
-
-                    let newAlbumPagedInfo = await MediaLibrary.getAssetsAsync(
-                        {album: newAlbum, createdAfter: recentTimestamp});
-                    let movedAsset = newAlbumPagedInfo.assets[newAlbumPagedInfo.assets.length - 1];
-                    recentTimestamp = movedAsset.creationTime - 1;
-
-                    await FotoService.updateById(
-                        oldFoto.id, movedAsset.uri, movedAsset.id, oldFoto.coleta_id);
                 }
 
                 if(oldAlbumPagedInfo.hasNextPage) {

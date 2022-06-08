@@ -70,7 +70,7 @@ const NavigationStack = () => {
 	            options={(props) => { 
 	            	return {
 	    				headerShadowVisible: false, 
-		            	title:'Collectfy',  
+		            	title:'Coletas+',  
 			    	}
 	            }} />
 	        <Stack.Screen 

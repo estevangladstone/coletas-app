@@ -64,7 +64,7 @@ const DadosScreen = (props) => {
                 projetoName = currProjeto.nome;
             }
 
-            let fileName = 'collectfy_'+slugify(projetoName)+'_'+formatDate(new Date())+'.csv';
+            let fileName = 'coletas-mais_'+slugify(projetoName)+'_'+formatDate(new Date())+'.csv';
 
             let fileUri = await FileService.createCacheFile(fileName, coletasCSV);
 
@@ -153,7 +153,7 @@ const DadosScreen = (props) => {
                 <Heading size="md" mb="1" style={{ color:'#404040' }}>Fotos de Coletas</Heading>
                 <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
                     Todas as fotografias associadas a registros de coleta são armazenadas na 
-                    pasta <Text italic>"Collectfy"</Text>, em pastas com o nome do Projeto correspondente. 
+                    pasta <Text italic>"Coletas+"</Text>, em pastas com o nome do Projeto correspondente. 
                     Também estão armazenadas em álbuns de mesmo nome, na galeria do dispositivo.
                     As coletas sem projeto associado, estão na pasta e álbum de nome "Sem projeto".
                 </Text>
