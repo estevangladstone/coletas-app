@@ -10,6 +10,7 @@ import ColetaService from '../../services/ColetaService';
 import ColetaCard from '../coletas/components/coleta-card';
 import { formatDatetime } from '../../helpers';
 import * as MediaLibrary from 'expo-media-library';
+import LoadingOverlay from './components/loading-overlay';
 
 
 const VisualizarProjetoScreen = (props) => {
@@ -20,6 +21,7 @@ const VisualizarProjetoScreen = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [haveMore, setHaveMore] = useState(true);
     const isFocused = useIsFocused();
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         ProjetoService.findById(props.route.params.id)
@@ -84,8 +86,10 @@ const VisualizarProjetoScreen = (props) => {
     const deleteProjeto = async () => {
         const { status } = await MediaLibrary.requestPermissionsAsync(false);
 
+        setIsDeleting(true);
         if (status === 'granted') {
             ProjetoService.deleteById(projeto.id).then(() => {
+                setIsDeleting(false);
                 Alert.alert(
                     "Sucesso",
                     "O Projeto foi removido com sucesso.",
@@ -93,6 +97,7 @@ const VisualizarProjetoScreen = (props) => {
                 );
             });
         } else {
+            setIsDeleting(false);
             Alert.alert(
                 "Erro",
                 "As permissões necessárias para acesso a Galeria não foram concedidas.",
@@ -171,6 +176,8 @@ const VisualizarProjetoScreen = (props) => {
                     Não existem Coletas associadas a este Projeto.</Text>
                 </Center> : null }
             </VStack>
+
+            {isDeleting && <LoadingOverlay/>}
         </Box>
     );
 }

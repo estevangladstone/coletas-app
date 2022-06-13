@@ -68,8 +68,6 @@ export default class ColetaService {
                 let album = await MediaLibrary.getAlbumAsync(projetoName ? projetoName : 'Sem projeto');
                 for(let i=0; i<newPhotos.length; i++) {
                     let asset = await MediaLibrary.createAssetAsync(newPhotos[i]);
-                    // obtem timestamp de criação do asset, para referencia
-                    let creationTimestamp = asset.creationTime - 1;
                     if(!album) {
                         // cria o album já movendo o asset para ele
                         album = await MediaLibrary.createAlbumAsync('Coletas+'+ (projetoName ? '/'+projetoName : '/Sem projeto'), asset, false);
@@ -78,10 +76,12 @@ export default class ColetaService {
                         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
                     }
 
-                    // obtem a lista de assets do album criados após a timestamp de referencia
-                    let albumPagedInfo = await MediaLibrary.getAssetsAsync({album: album, createdAfter: creationTimestamp});
-                    // obtem asset criado mais recentemente
-                    let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
+                    // obtem a lista de assets do album ordenado do mais recente ao mais antigo
+                    let albumPagedInfo = await MediaLibrary.getAssetsAsync({
+                        album: album, sortBy: [[MediaLibrary.SortBy.modificationTime, false]]
+                    });
+                    // obtem asset mais recente
+                    let movedAsset = albumPagedInfo.assets[0];
                     // cria o registro de foto no banco de dados
                     await FotoService.create(movedAsset.uri, movedAsset.id, coletaId);
                 }
@@ -133,7 +133,6 @@ export default class ColetaService {
             let album = await MediaLibrary.getAlbumAsync(currProjeto?._array[0] ? currProjeto._array[0].nome : 'Sem projeto');
             for(let i=0; i<newPhotos.length; i++) {
                 let asset = await MediaLibrary.createAssetAsync(newPhotos[i]);
-                let creationTimestamp = asset.creationTime - 1;
                 
                 if(!album) {
                     // cria o album já movendo o asset para ele
@@ -143,8 +142,10 @@ export default class ColetaService {
                     await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
                 }
                 
-                let albumPagedInfo = await MediaLibrary.getAssetsAsync({album: album, createdAfter: creationTimestamp});
-                let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
+                let albumPagedInfo = await MediaLibrary.getAssetsAsync({
+                    album: album, sortBy: [[MediaLibrary.SortBy.modificationTime, false]]
+                });
+                let movedAsset = albumPagedInfo.assets[0];
                 await FotoService.create(movedAsset.uri, movedAsset.id, model.id);
             }
         }
@@ -174,14 +175,9 @@ export default class ColetaService {
             // obter fotos associadas ao projeto
             let photosToMove = await this.getPhotosListById(model.id);
             let album = await MediaLibrary.getAlbumAsync(projetoName); 
-            let recentTimestamp = null;   
             // para cada foto, mover para a nova pasta
             for(let i=0; i<photosToMove.length; i++) {
                 let assetToMove = await MediaLibrary.getAssetInfoAsync(photosToMove[i].asset_id);
-
-                if(!recentTimestamp) {
-                    recentTimestamp = assetToMove.creationTime - 1;
-                }
 
                 if(!album) {
                     album = await MediaLibrary.createAlbumAsync('Coletas+'+ (projetoName ? '/'+projetoName : '/Sem projeto'), assetToMove, false);
@@ -189,12 +185,12 @@ export default class ColetaService {
                     await MediaLibrary.addAssetsToAlbumAsync([assetToMove], album, false);
                 }
 
-                // obtem a lista de assets do album criados após a timestamp de referencia
-                let albumPagedInfo = await MediaLibrary.getAssetsAsync(
-                    {album: album, createdAfter: recentTimestamp});
-                // obtem asset criado mais recentemente
-                let movedAsset = albumPagedInfo.assets[albumPagedInfo.assets.length - 1];
-                recentTimestamp = movedAsset.creationTime - 1;
+                // obtem a lista de assets do album ordenado do mais recente ao mais antigo
+                let albumPagedInfo = await MediaLibrary.getAssetsAsync({
+                    album: album, sortBy: [[MediaLibrary.SortBy.modificationTime, false]]
+                });
+                // obtem asset mais recente
+                let movedAsset = albumPagedInfo.assets[0];
                 // cria o registro de foto no banco de dados
                 await FotoService.updateById(
                     photosToMove[i].id, movedAsset.uri, movedAsset.id, model.id);

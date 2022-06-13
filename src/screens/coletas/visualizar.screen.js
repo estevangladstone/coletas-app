@@ -13,6 +13,7 @@ import DatetimeField from './components/datetime-field';
 
 import CameraControls from './components/camera-controls';
 import ProjetoSelectField from './components/projeto-select-field';
+import LoadingOverlay from '../projetos/components/loading-overlay';
 
 
 const EditarColetaScreen = (props) => {
@@ -20,6 +21,7 @@ const EditarColetaScreen = (props) => {
     const [coleta, setColeta] = useState({});
     const [photoList, setPhotoList] = useState([]);
     const [projetoName, setProjetoName] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         async function prepare() {
@@ -78,8 +80,10 @@ const EditarColetaScreen = (props) => {
     const deleteColeta = async () => {
         const { status } = await MediaLibrary.requestPermissionsAsync(false);
 
+        setIsDeleting(true);
         if (status === 'granted') {
             ColetaService.deleteById(coleta.id).then(() => {
+                setIsDeleting(false);
                 Alert.alert(
                     "Sucesso",
                     "O registro de Coleta foi removido com sucesso.",
@@ -87,6 +91,7 @@ const EditarColetaScreen = (props) => {
                 );
             });
         } else {
+            setIsDeleting(false);
             Alert.alert(
                 "Erro",
                 "As permissões necessárias para acesso a Galeria não foram concedidas.",
@@ -220,6 +225,8 @@ const EditarColetaScreen = (props) => {
                         isDisabled={true}/>
                 </VStack>
             </ScrollView>
+            
+            {isDeleting && <LoadingOverlay/>}
         </KeyboardAvoidingView>);
 }
 

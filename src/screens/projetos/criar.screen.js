@@ -6,6 +6,7 @@ import TextField from '../coletas/components/text-field';
 import TextAreaField from '../coletas/components/textarea-field';
 import ProjetoService from '../../services/ProjetoService';
 import Projeto from '../../models/Projeto';
+import LoadingOverlay from './components/loading-overlay';
 
 
 const CriarProjetoScreen = (props) => {
@@ -139,6 +140,8 @@ const CriarProjetoScreen = (props) => {
                 </VStack>
 
             </ScrollView>
+
+            {isLoading && <LoadingOverlay/>}
         </KeyboardAvoidingView>
     );
 

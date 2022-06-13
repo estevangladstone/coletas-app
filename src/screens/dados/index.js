@@ -154,8 +154,8 @@ const DadosScreen = (props) => {
                 <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
                     Todas as fotografias associadas a registros de coleta são armazenadas na 
                     pasta <Text italic>"Coletas+"</Text>, em pastas com o nome do Projeto correspondente. 
-                    Também estão armazenadas em álbuns de mesmo nome, na galeria do dispositivo.
-                    As coletas sem projeto associado, estão na pasta e álbum de nome "Sem projeto".
+                    Casa projeto também possui um álbum equivalente na galeria do dispositivo.
+                    As coletas sem projeto associado estão na pasta e álbum de nome "Sem projeto".
                 </Text>
             </VStack>
         </ScrollView>

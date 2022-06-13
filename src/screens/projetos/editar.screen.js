@@ -11,6 +11,7 @@ import TextAreaField from '../coletas/components/textarea-field';
 import ProjetoService from '../../services/ProjetoService';
 import Projeto from '../../models/Projeto';
 import * as MediaLibrary from 'expo-media-library';
+import LoadingOverlay from './components/loading-overlay';
 
 
 const EditarProjetoScreen = (props) => {
@@ -176,6 +177,8 @@ const EditarProjetoScreen = (props) => {
                     </Button>
                 </VStack>
             </ScrollView>
+
+            {isLoading && <LoadingOverlay/>}
         </KeyboardAvoidingView>);
 
 }

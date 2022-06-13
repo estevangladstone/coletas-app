@@ -16,6 +16,7 @@ import DatetimeField from './components/datetime-field';
 import CameraControls from './components/camera-controls';
 import LocationControls from './components/location-controls';
 import ProjetoSelectField from './components/projeto-select-field';
+import LoadingOverlay from '../projetos/components/loading-overlay';
 
 
 const CriarColetaScreen = (props) => {
@@ -293,6 +294,8 @@ const CriarColetaScreen = (props) => {
                     </Button>
                 </VStack>
             </ScrollView>
+
+            {isLoading && <LoadingOverlay/>}
         </KeyboardAvoidingView>);
 }
 

@@ -1,9 +1,21 @@
 import React from 'react';
 import { SafeAreaView, View, Image } from 'react-native';
 import { ScrollView, Center, Heading, Text } from 'native-base';
+import * as MediaLibrary from 'expo-media-library';
+import LoadingOverlay from '../projetos/components/loading-overlay';
 
 
 const SobreScreen = () => {
+
+    const [t, setT] = React.useState(null);
+
+    React.useEffect(() => {
+        (async ()=>{
+            let projetoName = null;
+            let album = await MediaLibrary.getAlbumAsync(projetoName ? projetoName : 'Sem projeto');
+            console.log('album = ', album);
+        })();
+    }, []);
 
     return (
         <SafeAreaView style={{flex: 1}}>
@@ -34,6 +46,7 @@ const SobreScreen = () => {
                 <Text fontSize="md" style={{ textAlign: 'justify' }}>
                     Este aplicativo foi desenvolvido como parte do Trabalho de Conclusão de Curso do Bacharelado em Ciência da Computação da UFRJ.
                 </Text>
+
             </ScrollView>
         </SafeAreaView>
     );
