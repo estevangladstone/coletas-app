@@ -1,21 +1,9 @@
 import React from 'react';
 import { SafeAreaView, View, Image } from 'react-native';
 import { ScrollView, Center, Heading, Text } from 'native-base';
-import * as MediaLibrary from 'expo-media-library';
-import LoadingOverlay from '../projetos/components/loading-overlay';
 
 
 const SobreScreen = () => {
-
-    const [t, setT] = React.useState(null);
-
-    React.useEffect(() => {
-        (async ()=>{
-            let projetoName = null;
-            let album = await MediaLibrary.getAlbumAsync(projetoName ? projetoName : 'Sem projeto');
-            console.log('album = ', album);
-        })();
-    }, []);
 
     return (
         <SafeAreaView style={{flex: 1}}>

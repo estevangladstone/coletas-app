@@ -73,7 +73,7 @@ export default class ProjetoService {
                         }
 
                         let albumPagedInfo = await MediaLibrary.getAssetsAsync({
-                            album: album, sortBy: [[MediaLibrary.SortBy.modificationTime, false]]
+                            album: newAlbum, sortBy: [[MediaLibrary.SortBy.modificationTime, false]]
                         });
                         let movedAsset = albumPagedInfo.assets[0];
 

@@ -8,6 +8,7 @@ import ProjetoService from '../../services/ProjetoService';
 import { jsonToCSV } from 'react-native-csv';
 import * as Sharing from 'expo-sharing';
 import { formatColetaData, formatDate, slugify } from '../../helpers';
+import LoadingOverlay from '../projetos/components/loading-overlay';
 
 
 const DadosScreen = (props) => {
@@ -107,58 +108,62 @@ const DadosScreen = (props) => {
     }
 
     return (
-        <ScrollView flex={1} bg="#fafafa">
-            <VStack mx="3" my="2">
-                <Heading size="md" mb="1" style={{ color:'#404040' }}>Exportar Coletas</Heading>
-                <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
-                    Selecione abaixo o conjuto desejado para exportar os registros de coletas em formato CSV.
-                </Text>
+        <>
+            <ScrollView flex={1} bg="#fafafa">
+                <VStack mx="3" my="2">
+                    <Heading size="md" mb="1" style={{ color:'#404040' }}>Exportar Coletas</Heading>
+                    <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
+                        Selecione abaixo o conjuto desejado para exportar os registros de coletas em formato CSV.
+                    </Text>
 
-                <View style={{borderRadius:4, overflow:'hidden', padding:0}}>
-                    <Picker
-                        style={{
-                            backgroundColor: '#e5e5e5',
-                            padding: '2%',
-                            overflow: 'hidden',
-                            fontSize: 16,
-                            color: 'black'
+                    <View style={{borderRadius:4, overflow:'hidden', padding:0}}>
+                        <Picker
+                            style={{
+                                backgroundColor: '#e5e5e5',
+                                padding: '2%',
+                                overflow: 'hidden',
+                                fontSize: 16,
+                                color: 'black'
+                            }}
+                            selectedValue={option}
+                            onValueChange={(value) => setOption(value)}>
+                            <Picker.Item label="Todas" value={-1} />
+                            <Picker.Item label="Sem projeto" value={0} />
+                            {
+                                projetos.map((item, index) => { 
+                                    return (<Picker.Item label={item.nome} value={item.id} key={index.toString()} />)
+                                })
+                            }
+                        </Picker>
+                    </View>
+
+                    <Button 
+                        isLoading={isLoadingDatabase} size="md" 
+                        my="2" bg="green.500" colorScheme="green"
+                        _text={{ fontSize:16 }}
+                        _loading={{
+                            bg: "green",
+                            _text: { color: "white" }
                         }}
-                        selectedValue={option}
-                        onValueChange={(value) => setOption(value)}>
-                        <Picker.Item label="Todas" value={-1} />
-                        <Picker.Item label="Sem projeto" value={0} />
-                        {
-                            projetos.map((item, index) => { 
-                                return (<Picker.Item label={item.nome} value={item.id} key={index.toString()} />)
-                            })
-                        }
-                    </Picker>
-                </View>
+                        _spinner={{ color: "white" }}
+                        isLoadingText="Gerando arquvio"
+                        onPress={() => exportDatabase()}>
+                        Gerar arquivo CSV
+                    </Button>
+                
+                    <Divider my="2" backgroundColor="#a3a3a3" />
+                    <Heading size="md" mb="1" style={{ color:'#404040' }}>Fotos de Coletas</Heading>
+                    <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
+                        Todas as fotografias associadas a registros de coleta são armazenadas na 
+                        pasta <Text italic>"Coletas+"</Text>, em pastas com o nome do Projeto correspondente. 
+                        Casa projeto também possui um álbum equivalente na galeria do dispositivo.
+                        As coletas sem projeto associado estão na pasta e álbum de nome "Sem projeto".
+                    </Text>
+                </VStack>
 
-                <Button 
-                    isLoading={isLoadingDatabase} size="md" 
-                    my="2" bg="green.500" colorScheme="green"
-                    _text={{ fontSize:16 }}
-                    _loading={{
-                        bg: "green",
-                        _text: { color: "white" }
-                    }}
-                    _spinner={{ color: "white" }}
-                    isLoadingText="Gerando arquvio"
-                    onPress={() => exportDatabase()}>
-                    Gerar arquivo CSV
-                </Button>
-            
-                <Divider my="2" backgroundColor="#a3a3a3" />
-                <Heading size="md" mb="1" style={{ color:'#404040' }}>Fotos de Coletas</Heading>
-                <Text my="1" fontSize="md" style={{ textAlign:'justify', color:'#525252' }}>
-                    Todas as fotografias associadas a registros de coleta são armazenadas na 
-                    pasta <Text italic>"Coletas+"</Text>, em pastas com o nome do Projeto correspondente. 
-                    Casa projeto também possui um álbum equivalente na galeria do dispositivo.
-                    As coletas sem projeto associado estão na pasta e álbum de nome "Sem projeto".
-                </Text>
-            </VStack>
-        </ScrollView>
+            </ScrollView>
+            {isLoadingDatabase && <LoadingOverlay/>}
+        </>
     );
 }
 
